@@ -1,11 +1,10 @@
 from typing import List, TypeVar, Generic, Union, Optional
 
 from sqlalchemy import update, delete, select, func
-from sqlalchemy.orm import InstrumentedAttribute
+
 
 from src.config.db_data import db
 from src.repositories import AbstractRepo
-# from src.models import Base
 
 
 class SQLalchemy(AbstractRepo):
@@ -61,7 +60,6 @@ class SQLalchemy(AbstractRepo):
             query = ( # получение значения 
                 select(self.model)
                 .filter_by(**filters)
-                .returning(self.model)
             )
 
             result = await session.execute(query)

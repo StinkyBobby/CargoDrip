@@ -21,7 +21,7 @@ class Database:
             await session.rollback()
             raise
         finally:
-            await session.Close()
+            await session.close()
 
     
 

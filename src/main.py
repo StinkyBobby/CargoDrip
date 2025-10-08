@@ -1,13 +1,13 @@
-import uvicorn
+import uvicorn 
 from fastapi import FastAPI 
 from fastapi.middleware.cors import CORSMiddleware
+from src.routers import get_apps_routes
 
 from src.config.db_data import settings
 
 def get_app() -> FastAPI:
     application = FastAPI(title = settings.DB_NAME)
     # тут потом дописать router и подобное
-    return application
 
     application.add_middleware(
         CORSMiddleware,
@@ -15,6 +15,12 @@ def get_app() -> FastAPI:
         allow_credentials=True,
         allow_methods=["*"],
     )
+    
+    application.include_router(
+        get_apps_routes()
+    )
+    return application
+
 
 app = get_app()
 

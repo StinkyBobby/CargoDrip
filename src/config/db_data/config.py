@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     DB_PORT: int
     DB_NAME: str
     ECHO: bool
+    CORS_ALLOWED_ORIGINS: str
 
 
     class Config:
@@ -22,4 +23,9 @@ class Settings(BaseSettings):
             f"{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
         )
 
+    @property
+    def origins(self) -> list[str]:
+        return self.CORS_ALLOWED_ORIGINS.split(",")
+    
+    
 settings = Settings()

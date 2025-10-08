@@ -1,4 +1,3 @@
-from .companies_scheme import CompanyCreate, CompanyDTO
 from .employee_scheme import EmployeeCreate, EmployeeDTO
 from .truck_scheme import TruckCreate, TruckDTO
 

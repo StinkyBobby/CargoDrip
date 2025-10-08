@@ -14,4 +14,4 @@ class EmployeeORM(Base):
     password_hash: Mapped[int]
     role: Mapped[UserType] = mapped_column(default=UserType.worker)
     email: Mapped[str] = mapped_column(unique=True)
-    created_at: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"))
+    created_at: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"))  

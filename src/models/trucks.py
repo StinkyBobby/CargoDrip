@@ -10,5 +10,4 @@ class TrucksORM(Base):
     model: Mapped[str]
     capacity_kg: Mapped[int]
     volume_m3: Mapped[int]
-    is_refrigerated: Mapped[bool]
-    available: Mapped[bool]
+    available: Mapped[bool] 
