@@ -1,6 +1,7 @@
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
+    PROJECT_NAME: str
     DB_HOST: str
     DB_USER: str
     DB_PASSWORD: str
@@ -20,5 +21,5 @@ class Settings(BaseSettings):
             f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASSWORD}@"
             f"{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
         )
-    
+
 settings = Settings()
