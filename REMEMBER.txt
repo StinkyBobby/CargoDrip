@@ -1,0 +1,14 @@
+[ Клиент (браузер, Postman) ]
+        ↓
+[ api (роуты) ]
+        ↓
+[ service (логика) ]
+        ↓
+[ repositories (база данных) ]
+        ↓
+[ models (таблицы SQLAlchemy) ]
+
+schemas используются на входе и выходе в api и service.
+service — мозг
+repositories — делают запросы к базе.
+models — таблицы

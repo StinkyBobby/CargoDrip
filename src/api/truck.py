@@ -40,6 +40,8 @@ async def get_trucks(
     return trucks
 
 
+
+
 @truck_router.get("/{truck_id}")
 async def get_truck(
     truck_id: int, 
@@ -58,23 +60,18 @@ async def delete_truck(
     return truck_delete
 
 
-# @book_router.put("/{id}")
-# async def update_book(
-#     book_id: int,
-#     new_book: BookCreateDTO,
-#     book_service: Annotated[BookService, Depends(Deps.book_service)],
-# ) -> BookDTO:
-#     updated_book = await book_service.update_book(book_id, new_book)
-#     return updated_book
+@truck_router.put("/{truck_id}")
+async def update_truck(
+    truck_id: int,
+    truck: TruckCreate,
+    truck_service: Annotated[TruckService, Depends(Deps.truck_service)],
+) -> TruckDTO:
+    return await truck_service.update_truck(truck_id, truck)
 
-
-
-
-# @book_router.post("/requests")
-# async def create_request(
-#     book_id: int,
-#     current_user: Annotated[UserDTO, Depends(OAuth2Utility.get_current_user)],
-#     request_service: Annotated[RequestService, Depends(Deps.request_service)]
-# ) -> RequestDTO:
-#     request = await request_service.create_request(book_id, current_user.id)
-#     return request
+@truck_router.patch("/{truck_id}/availability")
+async def available_truck(
+    truck_id: int,
+    available: bool,
+    truck_service: Annotated[TruckService, Depends(Deps.truck_service)],
+) -> TruckDTO:
+    return await truck_service.set_availability(truck_id, available)

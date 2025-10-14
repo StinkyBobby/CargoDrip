@@ -45,13 +45,8 @@ class TruckService():
                 status_code=status.HTTP_404_NOT_FOUND, detail="Truck is not found"
             )
 
-        truck_dict = truck.model_dump()
-        updated_truck = await self.truck_repo.update(truck_dict, id=truck_id)
-        updated_truck = TruckDTO.model_validate(updated_truck)
-        if db_trucks.count == 0 and truck.count != 0:
-            pass
-
-        return updated_truck
+        updated = await self.truck_repo.update(truck.model_dump(), id=truck_id)
+        return TruckDTO.model_validate(updated)
     
     
     async def delete_truck(self, truck_id: int) -> TruckDTO:
@@ -63,3 +58,14 @@ class TruckService():
             )
 
         return TruckDTO.model_validate(truck)
+    
+    async def set_availability(self, truck_id : int, available: bool) -> TruckDTO:
+        truck = await self.truck_repo.find(id=truck_id)
+        
+        if truck is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Truck is not found"
+            )
+            
+        updated = await self.truck_repo.update({"available": available}, id=truck_id)
+        return TruckDTO.model_validate(updated)

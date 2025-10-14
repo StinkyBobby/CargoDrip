@@ -1,5 +1,7 @@
+from fastapi.staticfiles import StaticFiles
 import uvicorn 
 from fastapi import FastAPI 
+from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from src.routers import get_apps_routes
 
@@ -29,6 +31,18 @@ app = get_app()
 def root():
     return "Hello World!"
 
+
+# Подключаем папку static (если используешь картинки, CSS и т.п.)
+app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
+
+# Роут для HTML-страницы
+@app.get("/trucks-page", response_class=HTMLResponse)
+def trucks_page():
+    try:
+        with open("frontend/trucktable.html", "r", encoding="utf-8") as f:
+            return f.read()
+    except Exception as e:
+        return HTMLResponse(content=f"<h1>Ошибка загрузки страницы</h1><p>{e}</p>", status_code=500)
 
 
 

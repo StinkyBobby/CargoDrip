@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Грузовики</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      max-width: 900px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: #333;
+    }
+    .form-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+    .form-group input {
+      flex: 1;
+      min-width: 150px;
+      padding: 0.75rem;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+    .form-group input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    .form-group button {
+      padding: 0.75rem 1.5rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .form-group button:hover {
+      transform: translateY(-2px);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 0.75rem;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .action-btn {
+      padding: 0.4rem 0.8rem;
+      margin: 0 2px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      color: white;
+    }
+    .delete-btn { background-color: #e74c3c; }
+    .edit-btn { background-color: #3498db; }
+    .message {
+      text-align: center;
+      margin-top: 1rem;
+      font-weight: bold;
+      color: #e74c3c;
+      display: none;
+    }
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+    .modal-content h2 {
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .modal-content input {
+      width: 100%;
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+    }
+    .modal-content button {
+      width: 100%;
+      padding: 0.75rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Управление грузовиками</h1>
+    <div class="form-group">
+      <input type="text" id="plate" placeholder="Номер ТС" />
+      <input type="text" id="model" placeholder="Модель" />
+      <input type="number" id="capacity" placeholder="Грузоподъёмность (кг)" min="0" />
+      <input type="number" id="volume" placeholder="Объём (м³)" min="0" />
+      <button onclick="addTruck()">Добавить</button>
+    </div>
+    <div class="message" id="error-message"></div>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Номер</th>
+          <th>Модель</th>
+          <th>Грузоподъёмность</th>
+          <th>Объём</th>
+          <th>Доступен</th>
+          <th>Действия</th>
+        </tr>
+      </thead>
+      <tbody id="truck-table"></tbody>
+    </table>
+  </div>
+
+<div class="modal" id="edit-modal">
+    <div class="modal-content">
+      <h2>Редактировать ТС</h2>
+      <label for="edit-plate">Номер ТС</label>
+      <input type="text" id="edit-plate" />
+      <label for="edit-model">Модель</label>
+      <input type="text" id="edit-model" />
+      <label for="edit-capacity">Грузоподъёмность (кг)</label>
+      <input type="number" id="edit-capacity" min="0" />
+      <label for="edit-volume">Объём (м³)</label>
+      <input type="number" id="edit-volume" min="0" />
+      <button onclick="submitEdit()">Сохранить</button>
+    </div>
+  </div>
+  
+  <div class="modal" id="delete-modal">
+    <div class="modal-content">
+      <h2>Подтвердите удаление</h2>
+      <p id="delete-message"></p>
+      <button onclick="confirmDelete()" style="background-color:#e74c3c; margin-bottom: 10px;">Удалить</button>
+      <button onclick="cancelDelete()">Отмена</button>
+    </div>
+  </div>
+  
+
+  <script>
+    let currentEditId = null;
+    let currentDeleteId = null;
+
+    async function toggleAvailability(id, currentStatus) {
+    const response = await fetch(`/trucks/${id}/availability?available=${!currentStatus}`, {
+        method: "PATCH"
+    });
+    if (response.ok) {
+        loadTrucks();
+    } 
+    else {
+        alert("Ошибка при смене доступности.");
+    }
+}
+
+
+    function openEditModal(id, plate, model, capacity, volume) {
+    currentEditId = id;
+    document.getElementById("edit-plate").value = plate;
+    document.getElementById("edit-model").value = model;
+    document.getElementById("edit-capacity").value = capacity;
+    document.getElementById("edit-volume").value = volume;
+    document.getElementById("edit-modal").style.display = "flex";
+    }
+
+    function openDeleteModal(id, plate) {
+    currentDeleteId = id;
+    document.getElementById("delete-message").textContent = `Вы точно хотите удалить ТС с номером "${plate}"?`;
+    document.getElementById("delete-modal").style.display = "flex";
+    }
+
+    function cancelDelete() {
+    currentDeleteId = null;
+    document.getElementById("delete-modal").style.display = "none";
+    }
+
+    async function confirmDelete() {
+    await fetch(`/trucks?truck_id=${currentDeleteId}`, { method: "DELETE" });
+    document.getElementById("delete-modal").style.display = "none";
+    loadTrucks();
+    }
+
+    window.addEventListener("click", function (event) {
+    if (event.target === document.getElementById("edit-modal")) {
+        document.getElementById("edit-modal").style.display = "none";
+    }
+    if (event.target === document.getElementById("delete-modal")) {
+        document.getElementById("delete-modal").style.display = "none";
+    }
+    });
+
+
+    async function loadTrucks() {
+      const response = await fetch("/trucks");
+      const data = await response.json();
+      const trucks = data.items || [];
+      const table = document.getElementById("truck-table");
+      table.innerHTML = "";
+
+      trucks.forEach(truck => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${truck.id}</td>
+          <td>${truck.plate_number}</td>
+          <td>${truck.model}</td>
+          <td>${truck.capacity_kg}</td>
+          <td>${truck.volume_m3}</td>
+          <td>${truck.available ? "Да" : "Нет"}</td>
+          <td>
+            <button class="action-btn delete-btn" onclick="openDeleteModal(${truck.id}, '${truck.plate_number}')">Удалить</button>
+            <button class="action-btn edit-btn" onclick="openEditModal(${truck.id}, '${truck.plate_number}', '${truck.model}', ${truck.capacity_kg}, ${truck.volume_m3})">Изменить</button>
+            <button class="action-btn" style="background-color:${truck.available ? '#f39c12' : '#2ecc71'}"
+  onclick="toggleAvailability(${truck.id}, ${truck.available})">
+  ${truck.available ? "Сделать недоступным" : "Сделать доступным"}
+</button>
+
+          </td>
+        `;
+        table.appendChild(row);
+      });
+    }
+
+    async function addTruck() {
+      const plate = document.getElementById("plate").value.trim();
+      const model = document.getElementById("model").value.trim();
+      const capacity = parseInt(document.getElementById("capacity").value);
+      const volume = parseInt(document.getElementById("volume").value);
+      const errorBox = document.getElementById("error-message");
+
+      if (!plate || !model || isNaN(capacity) || isNaN(volume) || capacity < 0 || volume < 0) {
+        errorBox.textContent = "Пожалуйста, заполните все поля корректно.";
+        errorBox.style.display = "block";
+        return;
+      }
+
+      errorBox.style.display = "none";
+
+      const truck = {
+        plate_number: plate,
+        model: model,
+        capacity_kg: capacity,
+        volume_m3: volume,
+        available: true
+      };
+
+      const response = await fetch("/trucks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(truck)
+      });
+
+      if (response.ok) {
+        document.getElementById("plate").value = "";
+        document.getElementById("model").value = "";
+        document.getElementById("capacity").value = "";
+        document.getElementById("volume").value = "";
+        loadTrucks();
+      } else {
+        errorBox.textContent = "Ошибка при добавлении. Проверьте данные.";
+        errorBox.style.display = "block";
+      }
+    }
+
+    async function deleteTruck(id) {
+      await fetch(`/trucks?truck_id=${id}`, { method: "DELETE" });
+      loadTrucks();
+    }
+
+    function openEditModal(id, plate, model, capacity, volume) {
+      currentEditId = id;
+      document.getElement;
+      document.getElementById("edit-plate").value = plate;
+      document.getElementById("edit-model").value = model;
+      document.getElementById("edit-capacity").value = capacity;
+      document.getElementById("edit-volume").value = volume;
+      document.getElementById("edit-modal").style.display = "flex";
+    }
+
+    async function submitEdit() {
+      const plate = document.getElementById("edit-plate").value.trim();
+      const model = document.getElementById("edit-model").value.trim();
+      const capacity = parseInt(document.getElementById("edit-capacity").value);
+      const volume = parseInt(document.getElementById("edit-volume").value);
+
+      if (!plate || !model || isNaN(capacity) || isNaN(volume) || capacity < 0 || volume < 0) {
+        alert("Пожалуйста, заполните все поля корректно.");
+        return;
+      }
+
+      const updatedTruck = {
+        plate_number: plate,
+        model: model,
+        capacity_kg: capacity,
+        volume_m3: volume,
+        available: true
+      };
+
+      const response = await fetch(`/trucks/${currentEditId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedTruck)
+      });
+
+      if (response.ok) {
+        document.getElementById("edit-modal").style.display = "none";
+        loadTrucks();
+      } else {
+        alert("Ошибка при обновлении. Проверьте данные.");
+      }
+    }
+
+    // Закрытие модального окна при клике вне формы
+    window.addEventListener("click", function (event) {
+      const modal = document.getElementById("edit-modal");
+      if (event.target === modal) {
+        modal.style.display = "none";
+      }
+    });
+
+    window.onload = loadTrucks;
+  </script>
+</body>
+</html>
