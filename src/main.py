@@ -44,6 +44,13 @@ def trucks_page():
     except Exception as e:
         return HTMLResponse(content=f"<h1>Ошибка загрузки страницы</h1><p>{e}</p>", status_code=500)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:8080"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 if __name__ == "__main__":

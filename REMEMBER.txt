@@ -12,3 +12,5 @@ schemas используются на входе и выходе в api и servi
 service — мозг
 repositories — делают запросы к базе.
 models — таблицы
+
+запуск uvicorn - uvicorn src.main:app --reload
