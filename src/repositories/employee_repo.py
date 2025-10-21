@@ -1,4 +1,4 @@
-from sqlalchemy_repo import SQLalchemy
+from src.repositories.sqlalchemy_repo import SQLalchemy
 from src.models.employee import EmployeeORM
 
 class EmployeeRepo(SQLalchemy):

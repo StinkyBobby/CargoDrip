@@ -1,18 +1,31 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 from src.models.types import UserType
 from datetime import datetime
 
+# Схема для регистрации или создания сотрудника
 class EmployeeCreate(BaseModel):
-    username: str = Field(max_length=100)
-    password_hash: int
+    username: str = Field(..., max_length=100)
+    password: str = Field(..., min_length=6)  # сырой пароль, будет хэшироваться
     role: UserType
-    email: str
-    created_at: datetime
+    email: EmailStr
 
-
-class EmployeeDTO(EmployeeCreate):
+# Схема для возврата данных о сотруднике (DTO)
+class EmployeeDTO(BaseModel):
     id: int
+    username: str
+    role: UserType
+    email: EmailStr
+    created_at: datetime
 
     class Config:
         from_attributes = True
 
+# Схема для входа
+class EmployeeLogin(BaseModel):
+    username: str
+    password: str
+
+# Схема для токена
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"

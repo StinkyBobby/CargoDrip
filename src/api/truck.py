@@ -2,14 +2,15 @@ from typing import List, Annotated
 
 from fastapi import APIRouter, Query, Depends
 
-from src.deps import Deps
+from src.deps.truck_deps import get_truck_service 
+
 from src.scheme import TruckDTO
 from src.scheme.truck_scheme import TruckCreate, TruckDTO, MoreTruckDTO
 from src.service.truck_service import TruckService
 from src.utils.error import Forbidden
 
 truck_router = APIRouter(
-    tags=["Truck"],
+    tags=["Truck"], 
     prefix="/trucks",
 )
 
@@ -17,7 +18,7 @@ truck_router = APIRouter(
 @truck_router.post("")
 async def create_truck(
     truck: TruckCreate,
-    truck_service: Annotated[TruckService, Depends(Deps.truck_service)],
+    truck_service: TruckService = Depends(get_truck_service),
 ) -> TruckDTO:
     db_truck = await truck_service.add_truck(truck)
     return db_truck
@@ -26,7 +27,7 @@ async def create_truck(
 @truck_router.post("/more")
 async def create_more(
     trucks: List[TruckCreate],
-    truck_service: Annotated[TruckService, Depends(Deps.truck_service)]
+    truck_service: TruckService = Depends(get_truck_service)
 ) -> List[TruckDTO]:
     dto_trucks = await truck_service.add_more(trucks)
     return dto_trucks
@@ -34,7 +35,7 @@ async def create_more(
 
 @truck_router.get("")
 async def get_trucks(
-    truck_service: Annotated[TruckService, Depends(Deps.truck_service)],
+    truck_service: TruckService = Depends(get_truck_service),
 ) -> MoreTruckDTO:
     trucks = await truck_service.get_more()
     return trucks
@@ -45,7 +46,7 @@ async def get_trucks(
 @truck_router.get("/{truck_id}")
 async def get_truck(
     truck_id: int, 
-    truck_service: Annotated[TruckService, Depends(Deps.truck_service)]
+    truck_service: TruckService = Depends(get_truck_service)
 ) -> TruckDTO:
     truck = await truck_service.get_single(id=truck_id)
     return truck
@@ -54,7 +55,7 @@ async def get_truck(
 @truck_router.delete("")
 async def delete_truck(
     truck_id: int,
-    truck_service: Annotated[TruckService, Depends(Deps.truck_service)]
+    truck_service: TruckService = Depends(get_truck_service)
 ) -> TruckDTO:
     truck_delete = await truck_service.delete_truck(truck_id)
     return truck_delete
@@ -64,7 +65,7 @@ async def delete_truck(
 async def update_truck(
     truck_id: int,
     truck: TruckCreate,
-    truck_service: Annotated[TruckService, Depends(Deps.truck_service)],
+    truck_service: TruckService = Depends(get_truck_service),
 ) -> TruckDTO:
     return await truck_service.update_truck(truck_id, truck)
 
@@ -72,6 +73,6 @@ async def update_truck(
 async def available_truck(
     truck_id: int,
     available: bool,
-    truck_service: Annotated[TruckService, Depends(Deps.truck_service)],
+    truck_service: TruckService = Depends(get_truck_service),
 ) -> TruckDTO:
     return await truck_service.set_availability(truck_id, available)

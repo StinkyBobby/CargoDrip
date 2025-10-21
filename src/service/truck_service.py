@@ -8,7 +8,7 @@ from src.scheme.truck_scheme import MoreTruckDTO, TruckDTO, TruckCreate
 
 class TruckService():
     def __init__(self, truck_repo: Callable[[], AbstractRepo]):
-        self.truck_repo: AbstractRepo = truck_repo()
+        self.truck_repo: AbstractRepo = truck_repo
     
     async def get_single(self, **filters) -> TruckDTO:
         truck = await self.truck_repo.find(**filters)

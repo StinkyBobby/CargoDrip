@@ -1,13 +1,14 @@
 from fastapi import APIRouter
 
 from src.api import (
-    truck_router
+    auth_router,
+    cargo_router,
+    truck_router,
 )
 
-
-def get_apps_routes() -> APIRouter:
-    router = APIRouter()
-
-    router.include_router(truck_router)
-
-    return router
+def get_apps_routes():
+    return [
+        auth_router,
+        cargo_router,
+        truck_router,
+    ]
