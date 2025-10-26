@@ -153,7 +153,7 @@
     </table>
   </div>
 
-<div class="modal" id="edit-modal">
+  <div class="modal" id="edit-modal">
     <div class="modal-content">
       <h2>Редактировать ТС</h2>
       <label for="edit-plate">Номер ТС</label>
@@ -167,7 +167,7 @@
       <button onclick="submitEdit()">Сохранить</button>
     </div>
   </div>
-  
+
   <div class="modal" id="delete-modal">
     <div class="modal-content">
       <h2>Подтвердите удаление</h2>
@@ -176,189 +176,165 @@
       <button onclick="cancelDelete()">Отмена</button>
     </div>
   </div>
-  
 
-  <script>
-    let currentEditId = null;
-    let currentDeleteId = null;
+ <script>
+  const API_BASE = "http://localhost:8000";
+  let currentEditId = null;
+  let currentDeleteId = null;
 
-    async function toggleAvailability(id, currentStatus) {
-    const response = await fetch(`/trucks/${id}/availability?available=${!currentStatus}`, {
-        method: "PATCH"
+  async function loadTrucks() {
+    const response = await fetch(`${API_BASE}/trucks`);
+    const data = await response.json();
+    const trucks = data.items || [];
+    const table = document.getElementById("truck-table");
+    table.innerHTML = "";
+
+    trucks.forEach(truck => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${truck.id}</td>
+        <td>${truck.plate_number}</td>
+        <td>${truck.model}</td>
+        <td>${truck.capacity_kg}</td>
+        <td>${truck.volume_m3}</td>
+        <td>${truck.available ? "Да" : "Нет"}</td>
+        <td>
+          <button class="action-btn delete-btn" onclick="openDeleteModal(${truck.id}, '${truck.plate_number}')">Удалить</button>
+          <button class="action-btn edit-btn" onclick="openEditModal(${truck.id}, '${truck.plate_number}', '${truck.model}', ${truck.capacity_kg}, ${truck.volume_m3})">Изменить</button>
+          <button class="action-btn" style="background-color:${truck.available ? '#f39c12' : '#2ecc71'}"
+            onclick="toggleAvailability(${truck.id}, ${truck.available})">
+            ${truck.available ? "Сделать недоступным" : "Сделать доступным"}
+          </button>
+        </td>
+      `;
+      table.appendChild(row);
     });
-    if (response.ok) {
-        loadTrucks();
-    } 
-    else {
-        alert("Ошибка при смене доступности.");
+  }
+
+  async function addTruck() {
+    const plate = document.getElementById("plate").value.trim();
+    const model = document.getElementById("model").value.trim();
+    const capacity = parseInt(document.getElementById("capacity").value);
+    const volume = parseInt(document.getElementById("volume").value);
+    const errorBox = document.getElementById("error-message");
+
+    if (!plate || !model || isNaN(capacity) || isNaN(volume) || capacity < 0 || volume < 0) {
+      errorBox.textContent = "Пожалуйста, заполните все поля корректно.";
+      errorBox.style.display = "block";
+      return;
     }
-}
 
+    errorBox.style.display = "none";
 
-    function openEditModal(id, plate, model, capacity, volume) {
+    const truck = {
+      plate_number: plate,
+      model: model,
+      capacity_kg: capacity,
+      volume_m3: volume,
+      available: true
+    };
+
+    const response = await fetch(`${API_BASE}/trucks`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(truck)
+    });
+
+    if (response.ok) {
+      document.getElementById("plate").value = "";
+      document.getElementById("model").value = "";
+      document.getElementById("capacity").value = "";
+      document.getElementById("volume").value = "";
+      loadTrucks();
+    } else {
+      errorBox.textContent = "Ошибка при добавлении. Проверьте данные.";
+      errorBox.style.display = "block";
+    }
+  }
+
+  function openEditModal(id, plate, model, capacity, volume) {
     currentEditId = id;
     document.getElementById("edit-plate").value = plate;
     document.getElementById("edit-model").value = model;
     document.getElementById("edit-capacity").value = capacity;
     document.getElementById("edit-volume").value = volume;
     document.getElementById("edit-modal").style.display = "flex";
+  }
+
+  async function submitEdit() {
+    const plate = document.getElementById("edit-plate").value.trim();
+    const model = document.getElementById("edit-model").value.trim();
+    const capacity = parseInt(document.getElementById("edit-capacity").value);
+    const volume = parseInt(document.getElementById("edit-volume").value);
+
+    if (!plate || !model || isNaN(capacity) || isNaN(volume) || capacity < 0 || volume < 0) {
+      alert("Пожалуйста, заполните все поля корректно.");
+      return;
     }
 
-    function openDeleteModal(id, plate) {
+    const updatedTruck = {
+      plate_number: plate,
+      model: model,
+      capacity_kg: capacity,
+      volume_m3: volume,
+      available: true
+    };
+
+    const response = await fetch(`${API_BASE}/trucks/${currentEditId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedTruck)
+    });
+
+    if (response.ok) {
+      document.getElementById("edit-modal").style.display = "none";
+      loadTrucks();
+    } else {
+      alert("Ошибка при обновлении. Проверьте данные.");
+    }
+  }
+
+  function openDeleteModal(id, plate) {
     currentDeleteId = id;
     document.getElementById("delete-message").textContent = `Вы точно хотите удалить ТС с номером "${plate}"?`;
     document.getElementById("delete-modal").style.display = "flex";
-    }
+  }
 
-    function cancelDelete() {
+  function cancelDelete() {
     currentDeleteId = null;
     document.getElementById("delete-modal").style.display = "none";
-    }
+  }
 
-    async function confirmDelete() {
-    await fetch(`/trucks?truck_id=${currentDeleteId}`, { method: "DELETE" });
+  async function confirmDelete() {
+    await fetch(`${API_BASE}/trucks?truck_id=${currentDeleteId}`, {
+      method: "DELETE"
+    });
     document.getElementById("delete-modal").style.display = "none";
     loadTrucks();
-    }
+  }
 
-    window.addEventListener("click", function (event) {
+  async function toggleAvailability(id, currentStatus) {
+    const response = await fetch(`${API_BASE}/trucks/${id}/availability?available=${!currentStatus}`, {
+      method: "PATCH"
+    });
+    if (response.ok) {
+      loadTrucks();
+    } else {
+      alert("Ошибка при смене доступности.");
+    }
+  }
+
+  window.addEventListener("click", function (event) {
     if (event.target === document.getElementById("edit-modal")) {
-        document.getElementById("edit-modal").style.display = "none";
+      document.getElementById("edit-modal").style.display = "none";
     }
     if (event.target === document.getElementById("delete-modal")) {
-        document.getElementById("delete-modal").style.display = "none";
+      document.getElementById("delete-modal").style.display = "none";
     }
-    });
+  });
 
+  window.onload = loadTrucks;
+</script>
 
-    async function loadTrucks() {
-      const response = await fetch("/trucks");
-      const data = await response.json();
-      const trucks = data.items || [];
-      const table = document.getElementById("truck-table");
-      table.innerHTML = "";
-
-      trucks.forEach(truck => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${truck.id}</td>
-          <td>${truck.plate_number}</td>
-          <td>${truck.model}</td>
-          <td>${truck.capacity_kg}</td>
-          <td>${truck.volume_m3}</td>
-          <td>${truck.available ? "Да" : "Нет"}</td>
-          <td>
-            <button class="action-btn delete-btn" onclick="openDeleteModal(${truck.id}, '${truck.plate_number}')">Удалить</button>
-            <button class="action-btn edit-btn" onclick="openEditModal(${truck.id}, '${truck.plate_number}', '${truck.model}', ${truck.capacity_kg}, ${truck.volume_m3})">Изменить</button>
-            <button class="action-btn" style="background-color:${truck.available ? '#f39c12' : '#2ecc71'}"
-  onclick="toggleAvailability(${truck.id}, ${truck.available})">
-  ${truck.available ? "Сделать недоступным" : "Сделать доступным"}
-</button>
-
-          </td>
-        `;
-        table.appendChild(row);
-      });
-    }
-
-    async function addTruck() {
-      const plate = document.getElementById("plate").value.trim();
-      const model = document.getElementById("model").value.trim();
-      const capacity = parseInt(document.getElementById("capacity").value);
-      const volume = parseInt(document.getElementById("volume").value);
-      const errorBox = document.getElementById("error-message");
-
-      if (!plate || !model || isNaN(capacity) || isNaN(volume) || capacity < 0 || volume < 0) {
-        errorBox.textContent = "Пожалуйста, заполните все поля корректно.";
-        errorBox.style.display = "block";
-        return;
-      }
-
-      errorBox.style.display = "none";
-
-      const truck = {
-        plate_number: plate,
-        model: model,
-        capacity_kg: capacity,
-        volume_m3: volume,
-        available: true
-      };
-
-      const response = await fetch("/trucks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(truck)
-      });
-
-      if (response.ok) {
-        document.getElementById("plate").value = "";
-        document.getElementById("model").value = "";
-        document.getElementById("capacity").value = "";
-        document.getElementById("volume").value = "";
-        loadTrucks();
-      } else {
-        errorBox.textContent = "Ошибка при добавлении. Проверьте данные.";
-        errorBox.style.display = "block";
-      }
-    }
-
-    async function deleteTruck(id) {
-      await fetch(`/trucks?truck_id=${id}`, { method: "DELETE" });
-      loadTrucks();
-    }
-
-    function openEditModal(id, plate, model, capacity, volume) {
-      currentEditId = id;
-      document.getElement;
-      document.getElementById("edit-plate").value = plate;
-      document.getElementById("edit-model").value = model;
-      document.getElementById("edit-capacity").value = capacity;
-      document.getElementById("edit-volume").value = volume;
-      document.getElementById("edit-modal").style.display = "flex";
-    }
-
-    async function submitEdit() {
-      const plate = document.getElementById("edit-plate").value.trim();
-      const model = document.getElementById("edit-model").value.trim();
-      const capacity = parseInt(document.getElementById("edit-capacity").value);
-      const volume = parseInt(document.getElementById("edit-volume").value);
-
-      if (!plate || !model || isNaN(capacity) || isNaN(volume) || capacity < 0 || volume < 0) {
-        alert("Пожалуйста, заполните все поля корректно.");
-        return;
-      }
-
-      const updatedTruck = {
-        plate_number: plate,
-        model: model,
-        capacity_kg: capacity,
-        volume_m3: volume,
-        available: true
-      };
-
-      const response = await fetch(`/trucks/${currentEditId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedTruck)
-      });
-
-      if (response.ok) {
-        document.getElementById("edit-modal").style.display = "none";
-        loadTrucks();
-      } else {
-        alert("Ошибка при обновлении. Проверьте данные.");
-      }
-    }
-
-    // Закрытие модального окна при клике вне формы
-    window.addEventListener("click", function (event) {
-      const modal = document.getElementById("edit-modal");
-      if (event.target === modal) {
-        modal.style.display = "none";
-      }
-    });
-
-    window.onload = loadTrucks;
-  </script>
 </body>
 </html>
