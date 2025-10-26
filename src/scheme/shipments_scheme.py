@@ -16,6 +16,5 @@ class ShipmentsCreate(BaseModel):
 class ShipmentsDTO(ShipmentsCreate):
     id: int
     
-
     class Config:
         from_attributes = True

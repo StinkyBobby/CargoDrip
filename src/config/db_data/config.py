@@ -9,6 +9,12 @@ class Settings(BaseSettings):
     DB_NAME: str
     ECHO: bool
     CORS_ALLOWED_ORIGINS: str
+    SECRET_KEY: int
+    PROJECT_NAME: str
+    PROJECT_VERSION: str
+    PORT: int
+    RELOAD: bool
+    DEBUG: bool
 
 
     class Config:

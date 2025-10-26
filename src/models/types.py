@@ -1,8 +1,8 @@
 from enum import Enum
 
-class UserType(Enum):
-    admin = "Admin"
-    worker = "Worker"
+class role_enum_new(Enum):
+    admin = "admin"
+    driver = "driver"
 
 class DeliveryStatus(Enum):
     waiting = "Waiting"

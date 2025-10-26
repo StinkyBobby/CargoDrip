@@ -6,3 +6,5 @@ class EmployeeLogin(BaseModel):
 
 class TokenResponse(BaseModel):
     access_token: str
+    role: str
+    redirect_url: str

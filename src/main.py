@@ -11,11 +11,8 @@ from src.routers import get_apps_routes
 app = FastAPI(title=settings.DB_NAME)
 
 
-
-# Шаблоны (если используешь Jinja2)
 templates = Jinja2Templates(directory="frontend")
 
-# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.origins,
@@ -31,7 +28,6 @@ for router in get_apps_routes():
 # Статика
 app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
 
-# Главная страница
 @app.get("/", response_class=HTMLResponse)
 def root():
     return """
@@ -39,11 +35,40 @@ def root():
     <p>Открой <a href='/docs'>Swagger</a> или <a href='/trucks-page'>таблицу грузовиков</a>.</p>
     """
 
-# HTML-страница
 @app.get("/trucks-page", response_class=HTMLResponse)
 def trucks_page(request: Request):
     try:
         return templates.TemplateResponse("trucktable.html", {"request": request})
+    except Exception as e:
+        return HTMLResponse(
+            content=f"<h1>Ошибка загрузки страницы</h1><p>{e}</p>",
+            status_code=500
+        )
+
+@app.get("/login", response_class=HTMLResponse)
+def login_page(request: Request):
+    try:
+        return templates.TemplateResponse("login.html", {"request": request})
+    except Exception as e:
+        return HTMLResponse(
+            content=f"<h1>Ошибка загрузки страницы</h1><p>{e}</p>",
+            status_code=500
+        )
+        
+@app.get("/admin_dashboard", response_class=HTMLResponse)
+def admin_dashboard_page(request: Request):
+    try:
+        return templates.TemplateResponse("admin_dashboard.html", {"request": request})
+    except Exception as e:
+        return HTMLResponse(
+            content=f"<h1>Ошибка загрузки страницы</h1><p>{e}</p>",
+            status_code=500
+        )
+
+@app.get("/driver_dashboard", response_class=HTMLResponse)
+def driver_dashboard_page(request: Request):
+    try:
+        return templates.TemplateResponse("driver_dashboard.html", {"request": request})
     except Exception as e:
         return HTMLResponse(
             content=f"<h1>Ошибка загрузки страницы</h1><p>{e}</p>",

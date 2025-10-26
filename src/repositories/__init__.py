@@ -1,5 +1,5 @@
 from .base_repo import AbstractRepo
-
+from .auth_repo import AuthRepo
 from .truck_repo import TrucksRepo
 from .cargo_repo import CargoRepo
 from .employee_repo import EmployeeRepo
@@ -13,5 +13,6 @@ __all__ = [
 'CargoRepo',
 'EmployeeRepo',
 'ShipmentsRepo',
-'SQLalchemy'
+'SQLalchemy',
+'AuthRepo'
 ]

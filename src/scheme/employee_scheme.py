@@ -1,19 +1,19 @@
 from pydantic import BaseModel, Field, EmailStr
-from src.models.types import UserType
+from src.models.types import role_enum_new
 from datetime import datetime
 
 # Схема для регистрации или создания сотрудника
 class EmployeeCreate(BaseModel):
     username: str = Field(..., max_length=100)
-    password: str = Field(..., min_length=6)  # сырой пароль, будет хэшироваться
-    role: UserType
+    password: str = Field(..., min_length=6, max_length=72)
+    role: role_enum_new
     email: EmailStr
 
 # Схема для возврата данных о сотруднике (DTO)
 class EmployeeDTO(BaseModel):
     id: int
     username: str
-    role: UserType
+    role: role_enum_new
     email: EmailStr
     created_at: datetime
 
