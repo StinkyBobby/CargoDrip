@@ -4,14 +4,13 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
-
 from src.config.db_data import settings
 from src.routers import get_apps_routes
 
 app = FastAPI(title=settings.DB_NAME)
 
-
 templates = Jinja2Templates(directory="frontend")
+
 
 app.add_middleware(
     CORSMiddleware,

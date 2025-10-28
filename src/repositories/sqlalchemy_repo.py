@@ -57,7 +57,7 @@ class SQLalchemy(AbstractRepo):
         
     async def find(self, **filters):
         async with db.get_session() as session:
-            query = ( # получение значения 
+            query = ( 
                 select(self.model)
                 .filter_by(**filters)
             )
