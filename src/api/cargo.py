@@ -1,12 +1,8 @@
 from typing import List
 from fastapi import APIRouter, Query, Depends
-
 from src.scheme.cargo_scheme import CargoCreate, CargoDTO, MoreCargoDTO
 from src.service.cargo_service import CargoService
-
 from src.deps.cargo_deps import get_cargo_service
-
-
 
 cargo_router = APIRouter(
     tags=["Cargo"],

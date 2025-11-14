@@ -4,6 +4,7 @@ from src.api import (
     auth_router,
     cargo_router,
     truck_router,
+    shipments_router,
 )
 
 def get_apps_routes():
@@ -11,4 +12,5 @@ def get_apps_routes():
         auth_router,
         cargo_router,
         truck_router,
+        shipments_router,
     ]
