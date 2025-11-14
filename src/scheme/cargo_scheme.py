@@ -4,8 +4,10 @@ from typing import List
 
 class CargoCreate(BaseModel):
     sender: str = Field(max_length=100)
+    recipient: str = Field(max_length=100)
     weight: int
     volume: int
+    title: str = Field(max_length=500)
 
 class CargoDTO(CargoCreate):
     id: int

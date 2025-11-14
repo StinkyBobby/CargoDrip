@@ -7,6 +7,8 @@ class CargoORM(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     sender: Mapped[str]
+    recipient: Mapped[str]
     weight: Mapped[int]
     volume: Mapped[int]
-
+    title: Mapped[str]
+    
