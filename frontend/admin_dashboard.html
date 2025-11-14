@@ -2,15 +2,1910 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Панель администратора</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Панель администратора | CargoDrip Беларусь</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body { font-family: sans-serif; padding: 20px; }
-    h2 { color: #333; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    :root {
+      --primary: #f39c12;
+      --primary-dark: #e67e22;
+      --secondary: #3498db;
+      --success: #2ecc71;
+      --danger: #e74c3c;
+      --warning: #f1c40f;
+      --dark: #0a1429;
+      --darker: #152347;
+      --light: rgba(255, 255, 255, 0.9);
+      --lighter: rgba(255, 255, 255, 0.7);
+    }
+
+    body {
+      background: linear-gradient(135deg, var(--dark), var(--darker), var(--dark));
+      background-size: 400% 400%;
+      animation: gradient 18s ease infinite;
+      min-height: 100vh;
+      padding: 20px;
+      overflow-x: hidden;
+      position: relative;
+      color: white;
+    }
+
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Звездное небо */
+    .stars {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle 4s infinite;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+
+    /* Улучшенный хедер */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding: 20px 30px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(25px);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+      z-index: 10;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .logo i {
+      font-size: 2.8rem;
+      color: var(--primary);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    .logo h1 {
+      font-size: 2rem;
+      background: linear-gradient(90deg, var(--primary), #ffd54f);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .nav-btn {
+      padding: 12px 25px;
+      background: linear-gradient(135deg, var(--secondary), #2980b9);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+    }
+
+    .nav-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(52, 152, 219, 0.5);
+    }
+
+    .logout-btn {
+      padding: 12px 25px;
+      background: linear-gradient(135deg, var(--danger), #c0392b);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+    }
+
+    .logout-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(231, 76, 60, 0.5);
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 25px;
+      min-height: 70vh;
+    }
+
+    /* Улучшенный сайдбар */
+    .sidebar {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(25px);
+      border-radius: 20px;
+      padding: 25px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+      z-index: 10;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .nav-item {
+      padding: 18px 20px;
+      margin: 12px 0;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      font-weight: 500;
+      border: 1px solid transparent;
+    }
+
+    .nav-item i {
+      width: 20px;
+      text-align: center;
+      font-size: 1.2rem;
+    }
+
+    .nav-item.active,
+    .nav-item:hover {
+      background: rgba(243, 156, 18, 0.15);
+      color: var(--primary);
+      border-color: rgba(243, 156, 18, 0.3);
+      transform: translateX(5px);
+    }
+
+    .content {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(25px);
+      border-radius: 20px;
+      padding: 35px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+      z-index: 10;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .content-section {
+      display: none;
+    }
+
+    .content-section.active {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-title {
+      font-size: 1.8rem;
+      margin-bottom: 25px;
+      color: var(--primary);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary), transparent);
+      border-radius: 2px;
+    }
+
+    /* Улучшенные карточки статистики */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 25px;
+      margin-bottom: 35px;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 25px;
+      border-radius: 16px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.4s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+    }
+
+    .stat-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: var(--primary);
+      margin-bottom: 12px;
+      text-shadow: 0 2px 10px rgba(243, 156, 18, 0.3);
+    }
+
+    .stat-label {
+      color: var(--lighter);
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    /* Улучшенные таблицы */
+    .table-container {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 25px;
+      max-height: 500px;
+      overflow-y: auto;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 18px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    th {
+      background: rgba(243, 156, 18, 0.15);
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      color: var(--primary);
+      font-size: 1rem;
+    }
+
+    tr {
+      transition: all 0.3s;
+    }
+
+    tr:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Фиксируем ширину колонок в таблице заявок */
+    #requests-tbody td:nth-child(1),
+    #requests-tbody th:nth-child(1) { width: 60px; min-width: 60px; } /* ID */
+    #requests-tbody td:nth-child(2),
+    #requests-tbody th:nth-child(2) { width: 200px; min-width: 200px; } /* Описание */
+    #requests-tbody td:nth-child(3),
+    #requests-tbody th:nth-child(3) { width: 120px; min-width: 120px; } /* Откуда */
+    #requests-tbody td:nth-child(4),
+    #requests-tbody th:nth-child(4) { width: 120px; min-width: 120px; } /* Куда */
+    #requests-tbody td:nth-child(5),
+    #requests-tbody th:nth-child(5) { width: 80px; min-width: 80px; } /* Вес */
+    #requests-tbody td:nth-child(6),
+    #requests-tbody th:nth-child(6) { width: 80px; min-width: 80px; } /* Объем */
+    #requests-tbody td:nth-child(7),
+    #requests-tbody th:nth-child(7) { width: 120px; min-width: 120px; } /* Статус */
+    #requests-tbody td:nth-child(8),
+    #requests-tbody th:nth-child(8) { width: 150px; min-width: 150px; } /* Водитель */
+    #requests-tbody td:nth-child(9),
+    #requests-tbody th:nth-child(9) { width: 180px; min-width: 180px; } /* Действия */
+
+    .action-btn {
+      padding: 8px 16px;
+      margin: 0 4px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: white;
+      font-size: 0.85rem;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 500;
+    }
+
+    .delete-btn {
+      background: linear-gradient(135deg, var(--danger), #c0392b);
+    }
+
+    .delete-btn:hover {
+      background: linear-gradient(135deg, #c0392b, #a93226);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+    }
+
+    .edit-btn {
+      background: linear-gradient(135deg, var(--secondary), #2980b9);
+    }
+
+    .edit-btn:hover {
+      background: linear-gradient(135deg, #2980b9, #2471a3);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+    }
+
+    .status-btn {
+      background: linear-gradient(135deg, var(--success), #27ae60);
+    }
+
+    .status-btn:hover {
+      background: linear-gradient(135deg, #27ae60, #219653);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(46, 204, 113, 0.4);
+    }
+
+    /* Улучшенные формы */
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--light);
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 15px 18px;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      color: white;
+      font-size: 1rem;
+      transition: all 0.3s;
+      appearance: none;
+    }
+
+    /* Стили для невалидных полей */
+    .form-control:invalid {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.2);
+    }
+
+    .form-control:valid {
+      border-color: var(--success);
+    }
+
+    .input-hint {
+      font-size: 0.85rem;
+      color: var(--lighter);
+      margin-top: 5px;
+      display: block;
+    }
+
+    .input-error {
+      font-size: 0.85rem;
+      color: var(--danger);
+      margin-top: 5px;
+      display: none;
+    }
+
+    .form-control:invalid + .input-error {
+      display: block;
+    }
+
+    /* Исправленные стили для select элементов */
+    select.form-control {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23f39c12' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 15px center;
+      background-size: 16px;
+      padding-right: 45px;
+    }
+
+    /* Стили для option в select */
+    .form-control option {
+      background: #1a2035 !important;
+      color: white !important;
+      padding: 12px !important;
+      border: none !important;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.2);
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .form-control::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .submit-btn {
+      padding: 15px 35px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: all 0.3s;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(230, 126, 34, 0.4);
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(230, 126, 34, 0.6);
+    }
+
+    .submit-btn:disabled {
+      background: rgba(255, 255, 255, 0.2);
+      color: rgba(255, 255, 255, 0.5);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Улучшенные модальные окна */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(15px);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      animation: modalFadeIn 0.3s ease;
+      padding: 20px;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, rgba(26, 32, 53, 0.98), rgba(21, 35, 71, 0.98));
+      backdrop-filter: blur(30px);
+      padding: 45px;
+      border-radius: 24px;
+      width: 90%;
+      max-width: 650px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6);
+      position: relative;
+      animation: modalSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes modalSlideIn {
+      from { transform: translateY(-60px) scale(0.9); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .modal-content::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--primary-dark), var(--warning));
+      border-radius: 24px 24px 0 0;
+    }
+
+    .modal-title {
+      color: var(--primary);
+      margin-bottom: 30px;
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 25px;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: var(--lighter);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close:hover {
+      color: var(--danger);
+      background: rgba(231, 76, 60, 0.15);
+      transform: rotate(90deg) scale(1.1);
+    }
+
+    /* Красивые селекты для водителей */
+    .driver-select {
+      position: relative;
+      margin-bottom: 25px;
+    }
+
+    .driver-select::after {
+      content: '\f078';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--primary);
+      pointer-events: none;
+      font-size: 0.9rem;
+      z-index: 2;
+    }
+
+    .driver-select select {
+      width: 100%;
+      padding: 15px 18px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      appearance: none;
+      transition: all 0.3s;
+      position: relative;
+      z-index: 1;
+    }
+
+    .driver-select select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.2);
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    /* Стили для статусов */
+    .status-badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: inline-block;
+      min-width: 100px;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .status-active {
+      background: rgba(46, 204, 113, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(46, 204, 113, 0.3);
+    }
+
+    .status-inactive {
+      background: rgba(231, 76, 60, 0.15);
+      color: var(--danger);
+      border: 1px solid rgba(231, 76, 60, 0.3);
+    }
+
+    .status-pending {
+      background: rgba(243, 156, 18, 0.15);
+      color: var(--primary);
+      border: 1px solid rgba(243, 156, 18, 0.3);
+    }
+
+    .status-completed {
+      background: rgba(52, 152, 219, 0.15);
+      color: var(--secondary);
+      border: 1px solid rgba(52, 152, 219, 0.3);
+    }
+
+    /* Сетка форм */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px;
+      margin-bottom: 25px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 15px;
+      justify-content: flex-end;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .cancel-btn {
+      padding: 12px 25px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.3s;
+      font-weight: 500;
+    }
+
+    .cancel-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Адаптивность */
+    @media (max-width: 1200px) {
+      .dashboard {
+        grid-template-columns: 1fr;
+      }
+      
+      .sidebar {
+        order: 2;
+      }
+      
+      .content {
+        order: 1;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+      }
+      
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      }
+      
+      .modal-content {
+        padding: 30px 25px;
+      }
+    }
+
+    /* Дополнительные элементы дизайна */
+    .welcome-message {
+      background: linear-gradient(135deg, rgba(243, 156, 18, 0.1), rgba(52, 152, 219, 0.1));
+      padding: 25px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 30px;
+    }
+
+    .welcome-message h3 {
+      color: var(--primary);
+      margin-bottom: 10px;
+      font-size: 1.4rem;
+    }
+
+    .welcome-message p {
+      color: var(--lighter);
+      line-height: 1.6;
+    }
+
+    /* Анимации для кнопок */
+    @keyframes buttonPulse {
+      0% { box-shadow: 0 0 0 0 rgba(243, 156, 18, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(243, 156, 18, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(243, 156, 18, 0); }
+    }
+
+    .pulse {
+      animation: buttonPulse 2s infinite;
+    }
+
+    /* Уведомления */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      border-radius: 12px;
+      color: white;
+      font-weight: 600;
+      z-index: 1001;
+      transform: translateX(400px);
+      transition: transform 0.3s ease;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .notification.show {
+      transform: translateX(0);
+    }
+
+    .notification.success {
+      background: linear-gradient(135deg, var(--success), #27ae60);
+    }
+
+    .notification.error {
+      background: linear-gradient(135deg, var(--danger), #c0392b);
+    }
+
+    .notification.info {
+      background: linear-gradient(135deg, var(--secondary), #2980b9);
+    }
   </style>
 </head>
 <body>
+  <!-- Звездное небо -->
+  <div class="stars" id="stars"></div>
 
-  <h2>Добро пожаловать, администратор!</h2>
-  <p>Здесь вы можете управлять пользователями, просматривать отчёты и контролировать систему.</p>
+  <!-- Уведомления -->
+  <div class="notification" id="notification"></div>
+
+  <div class="header">
+    <div class="logo">
+      <i class="fas fa-truck-fast"></i>
+      <h1>CargoDrip Беларусь</h1>
+    </div>
+    <div class="user-info">
+      <a href="/trucks-page" class="nav-btn">
+        <i class="fas fa-truck"></i> Управление грузовиками
+      </a>
+      <span style="color: var(--primary); font-weight: 600;">Администратор</span>
+      <button class="logout-btn" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i> Выйти
+      </button>
+    </div>
+  </div>
+
+  <div class="dashboard">
+    <div class="sidebar">
+      <div class="nav-item active" data-section="overview">
+        <i class="fas fa-tachometer-alt"></i> Обзор системы
+      </div>
+      <div class="nav-item" data-section="drivers">
+        <i class="fas fa-users"></i> Управление водителями
+      </div>
+      <div class="nav-item" data-section="cargo-requests">
+        <i class="fas fa-truck-loading"></i> Заявки на перевозку
+      </div>
+      <div class="nav-item" data-section="create-request">
+        <i class="fas fa-plus-circle"></i> Создать заявку
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- Обзор -->
+      <div class="content-section active" id="overview">
+        <h2 class="section-title">
+          <i class="fas fa-tachometer-alt"></i> Обзор системы
+        </h2>
+        
+        <div class="welcome-message">
+          <h3>Добро пожаловать в CargoDrip Беларусь!</h3>
+          <p>Система управления грузоперевозками по территории Республики Беларусь. Здесь вы можете управлять водителями, отслеживать заявки на перевозку и контролировать работу логистической системы.</p>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-number" id="drivers-count">0</div>
+            <div class="stat-label">Водителей в системе</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="active-drivers-count">0</div>
+            <div class="stat-label">Активных водителей</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="requests-count">0</div>
+            <div class="stat-label">Всего заявок</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="pending-requests-count">0</div>
+            <div class="stat-label">Заявок в процессе</div>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <h3 style="color: var(--primary); margin-bottom: 15px;">Последние заявки</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Маршрут</th>
+                <th>Статус</th>
+                <th>Водитель</th>
+              </tr>
+            </thead>
+            <tbody id="recent-requests">
+              <!-- Данные будут загружаться из БД -->
+              <tr>
+                <td colspan="4" style="text-align: center; color: var(--lighter);">
+                  <i class="fas fa-spinner fa-spin"></i> Загрузка данных...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Управление водителями -->
+      <div class="content-section" id="drivers">
+        <h2 class="section-title">
+          <i class="fas fa-users"></i> Управление водителями
+        </h2>
+        
+        <div class="form-group">
+          <h3 style="color: var(--primary); margin-bottom: 20px;">Добавить водителя</h3>
+          <form id="add-driver-form">
+            <div class="form-grid">
+              <div>
+                <label>Имя</label>
+                <input type="text" id="driver-name" class="form-control" required placeholder="Введите имя">
+              </div>
+              <div>
+                <label>Фамилия</label>
+                <input type="text" id="driver-surname" class="form-control" required placeholder="Введите фамилию">
+              </div>
+              <div>
+                <label>Телефон</label>
+                <input type="tel" id="driver-phone" class="form-control" required placeholder="+375 (XX) XXX-XX-XX">
+              </div>
+              <div>
+                <label>Категория прав</label>
+                <select id="driver-license" class="form-control" required>
+                  <option value="">Выберите категорию</option>
+                  <option value="B">B</option>
+                  <option value="C">C</option>
+                  <option value="CE">CE</option>
+                </select>
+              </div>
+              <div>
+                <label>Статус</label>
+                <select id="driver-status" class="form-control" required>
+                  <option value="active">Активен</option>
+                  <option value="inactive">Неактивен</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" class="submit-btn">
+              <i class="fas fa-user-plus"></i> Добавить водителя
+            </button>
+          </form>
+        </div>
+
+        <div class="table-container">
+          <table id="drivers-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Имя</th>
+                <th>Фамилия</th>
+                <th>Телефон</th>
+                <th>Категория</th>
+                <th>Статус</th>
+                <th>Действия</th>
+              </tr>
+            </thead>
+            <tbody id="drivers-tbody">
+              <!-- Данные будут загружаться из БД -->
+              <tr>
+                <td colspan="7" style="text-align: center; color: var(--lighter);">
+                  <i class="fas fa-spinner fa-spin"></i> Загрузка данных...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Заявки на перевозку -->
+      <div class="content-section" id="cargo-requests">
+        <h2 class="section-title">
+          <i class="fas fa-truck-loading"></i> Заявки на перевозку
+        </h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Описание груза</th>
+                <th>Откуда</th>
+                <th>Куда</th>
+                <th>Вес (кг)</th>
+                <th>Объем (м³)</th>
+                <th>Статус</th>
+                <th>Водитель</th>
+                <th>Действия</th>
+              </tr>
+            </thead>
+            <tbody id="requests-tbody">
+              <!-- Данные будут загружаться из БД -->
+              <tr>
+                <td colspan="9" style="text-align: center; color: var(--lighter);">
+                  <i class="fas fa-spinner fa-spin"></i> Загрузка данных...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Создание заявки -->
+      <div class="content-section" id="create-request">
+        <h2 class="section-title">
+          <i class="fas fa-plus-circle"></i> Создать заявку на перевозку
+        </h2>
+        <form id="create-request-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Откуда (город в Беларуси)</label>
+              <input type="text" id="from-location" class="form-control" required placeholder="Например: Минск">
+            </div>
+            <div class="form-group">
+              <label>Куда (город в Беларуси)</label>
+              <input type="text" id="to-location" class="form-control" required placeholder="Например: Гродно">
+            </div>
+            <div class="form-group">
+              <label>Вес груза (кг)</label>
+              <input type="number" id="cargo-weight" class="form-control" required 
+                     min="1" max="40000" 
+                     placeholder="От 1 до 40 000 кг"
+                     oninput="validateWeight(this)">
+              <span class="input-hint">Максимальный вес: 40 000 кг (40 тонн)</span>
+              <span class="input-error">Вес не может превышать 40 000 кг</span>
+            </div>
+            <div class="form-group">
+              <label>Объем груза (м³)</label>
+              <input type="number" id="cargo-volume" class="form-control" required 
+                     min="0.1" max="90" step="0.1"
+                     placeholder="От 0.1 до 90 м³"
+                     oninput="validateVolume(this)">
+              <span class="input-hint">Максимальный объем: 90 м³</span>
+              <span class="input-error">Объем не может превышать 90 м³</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Описание груза</label>
+            <textarea id="cargo-description" class="form-control" rows="3" required placeholder="Опишите тип груза и особые требования"></textarea>
+          </div>
+
+          <button type="submit" class="submit-btn pulse" id="create-request-btn">
+            <i class="fas fa-plus"></i> Создать заявку
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно редактирования водителя -->
+  <div class="modal" id="edit-driver-modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeEditDriverModal()">
+        <i class="fas fa-times"></i>
+      </button>
+      <h2 class="modal-title">
+        <i class="fas fa-user-edit"></i> Редактировать водителя
+      </h2>
+      <form id="edit-driver-form">
+        <input type="hidden" id="edit-driver-id">
+        <div class="form-grid">
+          <div>
+            <label>Имя</label>
+            <input type="text" id="edit-driver-name" class="form-control" required>
+          </div>
+          <div>
+            <label>Фамилия</label>
+            <input type="text" id="edit-driver-surname" class="form-control" required>
+          </div>
+          <div>
+            <label>Телефон</label>
+            <input type="tel" id="edit-driver-phone" class="form-control" required>
+          </div>
+          <div>
+            <label>Категория прав</label>
+            <select id="edit-driver-license" class="form-control" required>
+              <option value="B">B</option>
+              <option value="C">C</option>
+              <option value="CE">CE</option>
+            </select>
+          </div>
+          <div>
+            <label>Статус</label>
+            <select id="edit-driver-status" class="form-control" required>
+              <option value="active">Активен</option>
+              <option value="inactive">Неактивен</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="cancel-btn" onclick="closeEditDriverModal()">Отмена</button>
+          <button type="submit" class="submit-btn">Сохранить изменения</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Модальное окно редактирования заявки -->
+  <div class="modal" id="edit-request-modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeEditRequestModal()">
+        <i class="fas fa-times"></i>
+      </button>
+      <h2 class="modal-title">
+        <i class="fas fa-edit"></i> Редактировать заявку
+      </h2>
+      <form id="edit-request-form">
+        <input type="hidden" id="edit-request-id">
+        <div class="form-grid">
+          <div>
+            <label>Откуда</label>
+            <input type="text" id="edit-from-location" class="form-control" required>
+          </div>
+          <div>
+            <label>Куда</label>
+            <input type="text" id="edit-to-location" class="form-control" required>
+          </div>
+          <div>
+            <label>Вес груза (кг)</label>
+            <input type="number" id="edit-cargo-weight" class="form-control" required 
+                   min="1" max="40000"
+                   oninput="validateWeight(this)">
+            <span class="input-hint">Максимальный вес: 40 000 кг (40 тонн)</span>
+            <span class="input-error">Вес не может превышать 40 000 кг</span>
+          </div>
+          <div>
+            <label>Объем груза (м³)</label>
+            <input type="number" id="edit-cargo-volume" class="form-control" required 
+                   min="0.1" max="90" step="0.1"
+                   oninput="validateVolume(this)">
+            <span class="input-hint">Максимальный объем: 90 м³</span>
+            <span class="input-error">Объем не может превышать 90 м³</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Описание груза</label>
+          <textarea id="edit-cargo-description" class="form-control" rows="3" required></textarea>
+        </div>
+        <div class="form-group">
+          <label>Статус заявки</label>
+          <select id="edit-request-status" class="form-control" required>
+            <option value="в процессе">В процессе</option>
+            <option value="завершено">Завершено</option>
+            <option value="отменено">Отменено</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Назначить водителя</label>
+          <div class="driver-select">
+            <select id="edit-assigned-driver" class="form-control">
+              <option value="">Без водителя</option>
+              <!-- Опции будут добавляться через JavaScript -->
+            </select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="cancel-btn" onclick="closeEditRequestModal()">Отмена</button>
+          <button type="submit" class="submit-btn" id="edit-request-btn">Сохранить изменения</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Константы ограничений
+    const MAX_WEIGHT = 40000; // 40 тонн в кг
+    const MAX_VOLUME = 90;    // 90 м³
+
+    // Создание звездного неба
+    function createStars() {
+      const container = document.querySelector('.stars');
+      for (let i = 0; i < 150; i++) {
+        const star = document.createElement('div');
+        star.classList.add('star');
+        const size = Math.random() * 2 + 1;
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.top = `${Math.random() * 100}%`;
+        star.style.animationDelay = `${Math.random() * 4}s`;
+        star.style.opacity = Math.random() * 0.7 + 0.3;
+        container.appendChild(star);
+      }
+    }
+
+    // Функция для показа уведомлений
+    function showNotification(message, type = 'info') {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.className = `notification ${type} show`;
+      
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 3000);
+    }
+
+    // Валидация веса
+    function validateWeight(input) {
+      const value = parseFloat(input.value);
+      const isValid = !isNaN(value) && value >= 1 && value <= MAX_WEIGHT;
+      
+      if (value > MAX_WEIGHT) {
+        input.setCustomValidity(`Вес не может превышать ${MAX_WEIGHT} кг`);
+      } else {
+        input.setCustomValidity('');
+      }
+      
+      updateSubmitButtonState();
+      return isValid;
+    }
+
+    // Валидация объема
+    function validateVolume(input) {
+      const value = parseFloat(input.value);
+      const isValid = !isNaN(value) && value >= 0.1 && value <= MAX_VOLUME;
+      
+      if (value > MAX_VOLUME) {
+        input.setCustomValidity(`Объем не может превышать ${MAX_VOLUME} м³`);
+      } else {
+        input.setCustomValidity('');
+      }
+      
+      updateSubmitButtonState();
+      return isValid;
+    }
+
+    // Обновление состояния кнопки отправки
+    function updateSubmitButtonState() {
+      const createForm = document.getElementById('create-request-form');
+      const editForm = document.getElementById('edit-request-form');
+      
+      if (createForm) {
+        const weightInput = document.getElementById('cargo-weight');
+        const volumeInput = document.getElementById('cargo-volume');
+        const submitBtn = document.getElementById('create-request-btn');
+        
+        const isWeightValid = validateWeight(weightInput);
+        const isVolumeValid = validateVolume(volumeInput);
+        
+        submitBtn.disabled = !isWeightValid || !isVolumeValid;
+      }
+      
+      if (editForm) {
+        const editWeightInput = document.getElementById('edit-cargo-weight');
+        const editVolumeInput = document.getElementById('edit-cargo-volume');
+        const editSubmitBtn = document.getElementById('edit-request-btn');
+        
+        if (editWeightInput && editVolumeInput && editSubmitBtn) {
+          const isEditWeightValid = validateWeight(editWeightInput);
+          const isEditVolumeValid = validateVolume(editVolumeInput);
+          
+          editSubmitBtn.disabled = !isEditWeightValid || !isEditVolumeValid;
+        }
+      }
+    }
+
+    // Данные для Беларуси
+    const belarusCities = [
+      'Минск', 'Гомель', 'Могилёв', 'Витебск', 'Гродно', 'Брест',
+      'Барановичи', 'Борисов', 'Пинск', 'Орша', 'Мозырь', 'Солигорск',
+      'Новополоцк', 'Лида', 'Молодечно', 'Полоцк', 'Жлобин', 'Речица'
+    ];
+
+    // Пустые массивы для данных (будут заполняться из БД)
+    let drivers = [];
+    let cargoRequests = [];
+
+    // Функции для работы с БД
+    async function loadDrivers() {
+      // TODO: Реализовать загрузку водителей из БД
+      try {
+        const response = await fetch('/api/drivers', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        if (response.ok) {
+          drivers = await response.json();
+          updateDriversTable();
+          updateDriversSelect();
+          updateStats();
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки водителей:', error);
+        showNotification('Ошибка загрузки данных водителей', 'error');
+      }
+    }
+
+async function loadCargoRequests() {
+  try {
+    const response = await fetch('/cargoes', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Ошибка загрузки: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Универсальная обработка: если массив напрямую или объект с items
+    const backendCargoes = Array.isArray(data) ? data : (data.items || []);
+
+    updateRequestsTable(backendCargoes);
+    updateRecentRequests(backendCargoes);
+    updateStats(backendCargoes);
+
+  } catch (error) {
+    console.error('Ошибка загрузки заявок:', error);
+    showNotification('Ошибка загрузки данных заявок', 'error');
+  }
+}
+
+
+
+
+    // Навигация
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', function() {
+        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+        document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+        this.classList.add('active');
+        const sectionId = this.getAttribute('data-section');
+        document.getElementById(sectionId).classList.add('active');
+      });
+    });
+
+    // Обновление статистики
+    function updateStats() {
+      document.getElementById('drivers-count').textContent = drivers.length;
+      document.getElementById('active-drivers-count').textContent = drivers.filter(d => d.status === 'active').length;
+      document.getElementById('requests-count').textContent = cargoRequests.length;
+      document.getElementById('pending-requests-count').textContent = cargoRequests.filter(r => r.status === 'в процессе').length;
+    }
+
+    // Обновление последних заявок
+    function updateRecentRequests() {
+      const tbody = document.getElementById('recent-requests');
+      tbody.innerHTML = '';
+      
+      if (cargoRequests.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="4" style="text-align: center; color: var(--lighter);">
+              Нет данных для отображения
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      const recent = cargoRequests.slice(-5).reverse();
+      
+      recent.forEach(request => {
+        const row = document.createElement('tr');
+        const statusClass = request.status === 'в процессе' ? 'status-pending' : 
+                           request.status === 'завершено' ? 'status-completed' : 'status-inactive';
+        
+        const statusText = request.status === 'в процессе' ? 'В ПРОЦЕССЕ' : 
+                          request.status === 'завершено' ? 'ЗАВЕРШЕНО' : 'ОТМЕНЕНО';
+        
+        row.innerHTML = `
+          <td>${request.id}</td>
+          <td>${request.from} → ${request.to}</td>
+          <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+          <td>${request.driver || 'Не назначен'}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // Управление водителями
+    function updateDriversTable() {
+      const tbody = document.getElementById('drivers-tbody');
+      tbody.innerHTML = '';
+      
+      if (drivers.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; color: var(--lighter);">
+              Нет данных для отображения
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      drivers.forEach(driver => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${driver.id}</td>
+          <td>${driver.name}</td>
+          <td>${driver.surname}</td>
+          <td>${driver.phone}</td>
+          <td>${driver.license}</td>
+          <td><span class="status-badge ${driver.status === 'active' ? 'status-active' : 'status-inactive'}">
+            ${driver.status === 'active' ? 'АКТИВЕН' : 'НЕАКТИВЕН'}
+          </span></td>
+          <td>
+            <button class="action-btn edit-btn" onclick="openEditDriverModal(${driver.id})">
+              <i class="fas fa-edit"></i> Изменить
+            </button>
+            <button class="action-btn status-btn" onclick="toggleDriverStatus(${driver.id})">
+              <i class="fas fa-sync"></i> Статус
+            </button>
+            <button class="action-btn delete-btn" onclick="deleteDriver(${driver.id})">
+              <i class="fas fa-trash"></i> Удалить
+            </button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function updateDriversSelect() {
+      const editSelect = document.getElementById('edit-assigned-driver');
+      
+      if (editSelect) {
+        editSelect.innerHTML = '<option value="">Без водителя</option>';
+        drivers.filter(d => d.status === 'active').forEach(driver => {
+          const option = document.createElement('option');
+          option.value = driver.id;
+          option.textContent = `${driver.name} ${driver.surname} (${driver.license})`;
+          editSelect.appendChild(option);
+        });
+      }
+    }
+
+    function openEditDriverModal(id) {
+      const driver = drivers.find(d => d.id === id);
+      if (driver) {
+        document.getElementById('edit-driver-id').value = driver.id;
+        document.getElementById('edit-driver-name').value = driver.name;
+        document.getElementById('edit-driver-surname').value = driver.surname;
+        document.getElementById('edit-driver-phone').value = driver.phone;
+        document.getElementById('edit-driver-license').value = driver.license;
+        document.getElementById('edit-driver-status').value = driver.status;
+        document.getElementById('edit-driver-modal').style.display = 'flex';
+      }
+    }
+
+    function closeEditDriverModal() {
+      document.getElementById('edit-driver-modal').style.display = 'none';
+    }
+
+    async function toggleDriverStatus(id) {
+      // TODO: Реализовать обновление статуса в БД
+      const driver = drivers.find(d => d.id === id);
+      if (driver) {
+        try {
+          const response = await fetch(`/api/drivers/${id}/status`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({
+              status: driver.status === 'active' ? 'inactive' : 'active'
+            })
+          });
+          
+          if (response.ok) {
+            driver.status = driver.status === 'active' ? 'inactive' : 'active';
+            updateDriversTable();
+            updateStats();
+            showNotification(`Статус водителя ${driver.name} ${driver.surname} изменен`, 'success');
+          } else {
+            throw new Error('Ошибка сервера');
+          }
+        } catch (error) {
+          console.error('Ошибка обновления статуса:', error);
+          showNotification('Ошибка обновления статуса водителя', 'error');
+        }
+      }
+    }
+
+    async function deleteDriver(id) {
+      const driver = drivers.find(d => d.id === id);
+      if (driver && confirm(`Вы уверены, что хотите удалить водителя ${driver.name} ${driver.surname}?`)) {
+        try {
+          const response = await fetch(`/api/drivers/${id}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          });
+          
+          if (response.ok) {
+            drivers = drivers.filter(driver => driver.id !== id);
+            updateDriversTable();
+            updateDriversSelect();
+            updateStats();
+            showNotification('Водитель успешно удален', 'success');
+          } else {
+            throw new Error('Ошибка сервера');
+          }
+        } catch (error) {
+          console.error('Ошибка удаления водителя:', error);
+          showNotification('Ошибка удаления водителя', 'error');
+        }
+      }
+    }
+
+    // Добавление водителя
+    document.getElementById('add-driver-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const formData = {
+        name: document.getElementById('driver-name').value,
+        surname: document.getElementById('driver-surname').value,
+        phone: document.getElementById('driver-phone').value,
+        license: document.getElementById('driver-license').value,
+        status: document.getElementById('driver-status').value
+      };
+
+      try {
+        const response = await fetch('/api/drivers', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) {
+          throw new Error(`Ошибка сервера: ${response.status}`);
+        }
+
+        const newDriver = await response.json();
+        drivers.push(newDriver);
+        
+        updateDriversTable();
+        updateDriversSelect();
+        updateStats();
+        
+        this.reset();
+        showNotification('Водитель успешно добавлен!', 'success');
+      } catch (error) {
+        console.error('Ошибка добавления водителя:', error);
+        showNotification(`Ошибка добавления водителя: ${error.message}`, 'error');
+      }
+    });
+
+    // Редактирование водителя
+    document.getElementById('edit-driver-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const id = parseInt(document.getElementById('edit-driver-id').value);
+      const driver = drivers.find(d => d.id === id);
+      
+      if (driver) {
+        const formData = {
+          name: document.getElementById('edit-driver-name').value,
+          surname: document.getElementById('edit-driver-surname').value,
+          phone: document.getElementById('edit-driver-phone').value,
+          license: document.getElementById('edit-driver-license').value,
+          status: document.getElementById('edit-driver-status').value
+        };
+
+        try {
+          const response = await fetch(`/api/drivers/${id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify(formData)
+          });
+
+          if (!response.ok) {
+            throw new Error(`Ошибка сервера: ${response.status}`);
+          }
+
+          // Обновляем локальные данные
+          Object.assign(driver, formData);
+          
+          updateDriversTable();
+          updateDriversSelect();
+          updateStats();
+          closeEditDriverModal();
+          showNotification('Данные водителя обновлены!', 'success');
+        } catch (error) {
+          console.error('Ошибка обновления водителя:', error);
+          showNotification(`Ошибка обновления водителя: ${error.message}`, 'error');
+        }
+      }
+    });
+
+    // Управление заявками
+    function updateRequestsTable() {
+      const tbody = document.getElementById('requests-tbody');
+      tbody.innerHTML = '';
+      
+      if (cargoRequests.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" style="text-align: center; color: var(--lighter);">
+              Нет данных для отображения
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      cargoRequests.forEach(request => {
+        const statusClass = request.status === 'в процессе' ? 'status-pending' : 
+                           request.status === 'завершено' ? 'status-completed' : 'status-inactive';
+        
+        const statusText = request.status === 'в процессе' ? 'В ПРОЦЕССЕ' : 
+                          request.status === 'завершено' ? 'ЗАВЕРШЕНО' : 'ОТМЕНЕНО';
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${request.id}</td>
+          <td>${request.description}</td>
+          <td>${request.from}</td>
+          <td>${request.to}</td>
+          <td>${request.weight}</td>
+          <td>${request.volume}</td>
+          <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+          <td>${request.driver || 'Не назначен'}</td>
+          <td>
+            <button class="action-btn edit-btn" onclick="openEditRequestModal(${request.id})">
+              <i class="fas fa-edit"></i> Изменить
+            </button>
+            <button class="action-btn delete-btn" onclick="deleteRequest(${request.id})">
+              <i class="fas fa-trash"></i> Удалить
+            </button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function openEditRequestModal(id) {
+      const request = cargoRequests.find(r => r.id === id);
+      if (request) {
+        document.getElementById('edit-request-id').value = request.id;
+        document.getElementById('edit-from-location').value = request.from;
+        document.getElementById('edit-to-location').value = request.to;
+        document.getElementById('edit-cargo-weight').value = request.weight;
+        document.getElementById('edit-cargo-volume').value = request.volume;
+        document.getElementById('edit-cargo-description').value = request.description;
+        document.getElementById('edit-request-status').value = request.status;
+        
+        // Находим ID водителя по имени
+        const driver = drivers.find(d => `${d.name} ${d.surname}` === request.driver);
+        if (driver) {
+          document.getElementById('edit-assigned-driver').value = driver.id;
+        } else {
+          document.getElementById('edit-assigned-driver').value = '';
+        }
+        
+        document.getElementById('edit-request-modal').style.display = 'flex';
+        
+        // Обновляем состояние кнопки после загрузки данных
+        setTimeout(updateSubmitButtonState, 100);
+      }
+    }
+
+    function closeEditRequestModal() {
+      document.getElementById('edit-request-modal').style.display = 'none';
+    }
+
+    async function deleteRequest(id) {
+      const request = cargoRequests.find(r => r.id === id);
+      if (request && confirm(`Вы уверены, что хотите удалить заявку #${id}?`)) {
+        try {
+          const response = await fetch(`/cargoes/${id}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          });
+          
+          if (response.ok) {
+            cargoRequests = cargoRequests.filter(request => request.id !== id);
+            updateRequestsTable();
+            updateRecentRequests();
+            updateStats();
+            showNotification('Заявка успешно удалена', 'success');
+          } else {
+            throw new Error('Ошибка сервера');
+          }
+        } catch (error) {
+          console.error('Ошибка удаления заявки:', error);
+          showNotification('Ошибка удаления заявки', 'error');
+        }
+      }
+    }
+
+    // Создание заявки
+    document.getElementById('create-request-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const weight = parseFloat(document.getElementById('cargo-weight').value);
+      const volume = parseFloat(document.getElementById('cargo-volume').value);
+      
+      // Валидация
+      if (weight > MAX_WEIGHT) {
+        showNotification(`Ошибка: вес не может превышать ${MAX_WEIGHT} кг`, 'error');
+        return;
+      }
+      
+      if (volume > MAX_VOLUME) {
+        showNotification(`Ошибка: объем не может превышать ${MAX_VOLUME} м³`, 'error');
+        return;
+      }
+
+      // Получаем данные формы и преобразуем в структуру CargoCreate
+      const formData = {
+        sender: document.getElementById('from-location').value,
+        recipient: document.getElementById('to-location').value,
+        weight: weight,
+        volume: volume,
+        title: document.getElementById('cargo-description').value
+      };
+
+      try {
+        // Показываем индикатор загрузки
+        const submitBtn = document.getElementById('create-request-btn');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Создание...';
+        submitBtn.disabled = true;
+
+        // Отправляем запрос к вашему API
+        const response = await fetch('/cargoes', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.detail || `Ошибка сервера: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        // Обновляем локальные данные (преобразуем CargoDTO в наш формат)
+        const newRequest = {
+          id: result.id,
+          description: result.title,
+          from: result.sender,
+          to: result.recipient,
+          weight: result.weight,
+          volume: result.volume,
+          status: 'в процессе', // Добавляем статус, т.к. его нет в CargoDTO
+          driver: '' // Добавляем поле водителя
+        };
+
+        cargoRequests.push(newRequest);
+        updateRequestsTable();
+        updateRecentRequests();
+        updateStats();
+
+        // Сбрасываем форму
+        this.reset();
+        showNotification('Заявка успешно создана!', 'success');
+
+      } catch (error) {
+        console.error('Ошибка при создании заявки:', error);
+        showNotification(`Ошибка при создании заявки: ${error.message}`, 'error');
+      } finally {
+        // Восстанавливаем кнопку
+        const submitBtn = document.getElementById('create-request-btn');
+        submitBtn.innerHTML = '<i class="fas fa-plus"></i> Создать заявку';
+        submitBtn.disabled = false;
+        updateSubmitButtonState();
+      }
+    });
+
+    // Редактирование заявки
+    document.getElementById('edit-request-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const weight = parseFloat(document.getElementById('edit-cargo-weight').value);
+      const volume = parseFloat(document.getElementById('edit-cargo-volume').value);
+      
+      // Валидация
+      if (weight > MAX_WEIGHT) {
+        showNotification(`Ошибка: вес не может превышать ${MAX_WEIGHT} кг`, 'error');
+        return;
+      }
+      
+      if (volume > MAX_VOLUME) {
+        showNotification(`Ошибка: объем не может превышать ${MAX_VOLUME} м³`, 'error');
+        return;
+      }
+      
+      const id = parseInt(document.getElementById('edit-request-id').value);
+      const request = cargoRequests.find(r => r.id === id);
+      const driverId = document.getElementById('edit-assigned-driver').value;
+      const driver = drivers.find(d => d.id == driverId);
+      
+      if (request) {
+        const formData = {
+          sender: document.getElementById('edit-from-location').value,
+          recipient: document.getElementById('edit-to-location').value,
+          weight: weight,
+          volume: volume,
+          title: document.getElementById('edit-cargo-description').value
+        };
+
+        try {
+          const response = await fetch(`/cargoes/${id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify(formData)
+          });
+
+          if (!response.ok) {
+            throw new Error(`Ошибка сервера: ${response.status}`);
+          }
+
+          const result = await response.json();
+
+          // Обновляем локальные данные из ответа
+          Object.assign(request, {
+            description: result.title,
+            from: result.sender,
+            to: result.recipient,
+            weight: result.weight,
+            volume: result.volume,
+            status: document.getElementById('edit-request-status').value,
+            driver: driver ? `${driver.name} ${driver.surname}` : ''
+          });
+
+          updateRequestsTable();
+          updateRecentRequests();
+          updateStats();
+          closeEditRequestModal();
+          showNotification('Заявка обновлена!', 'success');
+        } catch (error) {
+          console.error('Ошибка обновления заявки:', error);
+          showNotification(`Ошибка обновления заявки: ${error.message}`, 'error');
+        }
+      }
+    });
+
+    // Функция выхода
+    function logout() {
+      if (confirm('Вы уверены, что хотите выйти?')) {
+        localStorage.removeItem("role")
+        localStorage.removeItem("token")
+        window.location.href = '/login';
+      }
+    }
+
+    // Инициализация при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+      createStars();
+      updateSubmitButtonState();
+      
+      // Загружаем данные из БД
+      loadDrivers();
+      loadCargoRequests();
+      
+      // Закрытие модальных окон при клике вне их
+      window.addEventListener('click', function(event) {
+        const editDriverModal = document.getElementById('edit-driver-modal');
+        const editRequestModal = document.getElementById('edit-request-modal');
+        
+        if (event.target === editDriverModal) {
+          closeEditDriverModal();
+        }
+        if (event.target === editRequestModal) {
+          closeEditRequestModal();
+        }
+      });
+
+      // Автозаполнение городов Беларуси
+      const fromInput = document.getElementById('from-location');
+      const toInput = document.getElementById('to-location');
+      
+      if (fromInput) {
+        fromInput.setAttribute('list', 'cities-list');
+      }
+      if (toInput) {
+        toInput.setAttribute('list', 'cities-list');
+      }
+      
+      // Создаем datalist для автозаполнения
+      const datalist = document.createElement('datalist');
+      datalist.id = 'cities-list';
+      belarusCities.forEach(city => {
+        const option = document.createElement('option');
+        option.value = city;
+        datalist.appendChild(option);
+      });
+      document.body.appendChild(datalist);
+    });
+  </script>
 </body>
 </html>

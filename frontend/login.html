@@ -2,39 +2,1099 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Вход</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Вход в систему | CargoDrip</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body { font-family: sans-serif; max-width: 400px; margin: 50px auto; }
-    label { display: block; margin-bottom: 10px; }
-    input { width: 100%; padding: 8px; margin-top: 4px; }
-    button { padding: 10px 20px; margin-top: 10px; }
-    #error { color: red; margin-top: 10px; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      cursor: default;
+      pointer-events: none; /* Запрещаем все клики по умолчанию */
+    }
+
+    body {
+      background: linear-gradient(135deg, #0a1429, #152347, #0a1429);
+      background-size: 400% 400%;
+      animation: gradient 18s ease infinite;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Разрешаем клики только для нужных элементов */
+    input,
+    button,
+    .password-toggle,
+    .submit-btn,
+    form {
+      pointer-events: auto;
+    }
+
+    /* Городской фон с улучшенными зданиями */
+    .city-background {
+      position: fixed;
+      bottom: 120px;
+      left: 0;
+      width: 100%;
+      height: 400px;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding: 0 20px;
+    }
+
+    .building {
+      position: relative;
+      background: linear-gradient(to top, #1a237e, #283593, #303f9f);
+      border-left: 3px solid #5c6bc0;
+      border-right: 3px solid #5c6bc0;
+      box-shadow: 
+        inset 0 -15px 30px rgba(0,0,0,0.4),
+        0 5px 15px rgba(0,0,0,0.3);
+      margin: 0 10px;
+    }
+
+    /* Улучшенные реалистичные крыши */
+    .building-roof {
+      position: absolute;
+      top: -25px;
+      left: -10px;
+      width: calc(100% + 20px);
+      height: 25px;
+      background: linear-gradient(45deg, #b71c1c, #c62828, #d32f2f);
+      clip-path: polygon(0 100%, 2% 70%, 5% 40%, 10% 20%, 20% 10%, 80% 10%, 90% 20%, 95% 40%, 98% 70%, 100% 100%);
+      box-shadow: 
+        0 5px 15px rgba(0,0,0,0.5),
+        inset 0 2px 5px rgba(255,255,255,0.1);
+      border-bottom: 3px solid #8e0000;
+    }
+
+    .building-roof::before {
+      content: '';
+      position: absolute;
+      top: 5px;
+      left: 20%;
+      right: 20%;
+      height: 8px;
+      background: linear-gradient(90deg, transparent, #ff8a65, transparent);
+      border-radius: 4px;
+      box-shadow: 0 0 10px #ff8a65;
+    }
+
+    .window {
+      position: absolute;
+      background: linear-gradient(135deg, #ffeb3b, #fbc02d);
+      border-radius: 3px;
+      box-shadow: 
+        0 0 12px rgba(255, 235, 59, 0.7),
+        inset 0 2px 4px rgba(255, 255, 255, 0.4);
+      transition: all 0.5s ease;
+      border: 1px solid #ffd54f;
+    }
+
+    .window:hover {
+      background: linear-gradient(135deg, #ffd54f, #ffb300);
+      box-shadow: 0 0 20px rgba(255, 213, 79, 0.9);
+    }
+
+    .window-frame {
+      position: absolute;
+      background: #4e342e;
+      border-radius: 4px;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+    }
+
+    /* Улучшенные компактные фонари */
+    .street-lamp {
+      position: fixed;
+      bottom: 140px;
+      z-index: 3;
+    }
+
+    .lamp-pole {
+      width: 5px;
+      height: 70px;
+      background: linear-gradient(to top, #263238, #37474f, #455a64);
+      margin: 0 auto;
+      position: relative;
+      border-radius: 2px 2px 0 0;
+    }
+
+    .lamp-arm {
+      width: 40px;
+      height: 6px;
+      background: linear-gradient(90deg, #37474f, #546e7a, #37474f);
+      position: absolute;
+      top: -10px;
+      left: -17px;
+      border-radius: 3px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+
+    .lamp-arm::before {
+      content: '';
+      position: absolute;
+      top: 1px;
+      left: 1px;
+      right: 1px;
+      bottom: 1px;
+      background: linear-gradient(90deg, #455a64, #607d8b, #455a64);
+      border-radius: 2px;
+    }
+
+    .lamp-light {
+      width: 25px;
+      height: 25px;
+      background: radial-gradient(circle at 30% 30%, #fffde7, #ffeb3b, #ffd54f);
+      border-radius: 50%;
+      position: absolute;
+      top: -30px;
+      left: -10px;
+      box-shadow: 
+        0 0 30px 10px rgba(255, 235, 59, 0.6),
+        0 0 60px 20px rgba(255, 213, 79, 0.3);
+      animation: lamp-flicker 4s ease-in-out infinite;
+      filter: blur(1px);
+    }
+
+    .lamp-light::before {
+      content: '';
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      width: 8px;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      filter: blur(1.5px);
+    }
+
+    @keyframes lamp-flicker {
+      0%, 100% { opacity: 0.9; transform: scale(1); }
+      25% { opacity: 0.95; transform: scale(1.02); }
+      50% { opacity: 1; transform: scale(1.05); }
+      75% { opacity: 0.92; transform: scale(0.98); }
+    }
+
+    /* Дорога с двумя полосами */
+    .road-container {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 140px;
+      background: #2c3e50;
+      z-index: 2;
+      overflow: hidden;
+    }
+
+    .road {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .road-lane {
+      position: absolute;
+      width: 50%;
+      height: 50%;
+    }
+
+    .road-lane.bottom {
+      bottom: 0;
+      border-top: 3px dashed #ffd54f;
+    }
+
+    .road-lane.top {
+      top: 0;
+      border-bottom: 3px dashed #ffd54f;
+    }
+
+    .road-lane.left {
+      left: 0;
+    }
+
+    .road-lane.right {
+      right: 0;
+    }
+
+    .road-markings {
+      position: absolute;
+      width: 100%;
+      height: 4px;
+      background: repeating-linear-gradient(
+        90deg,
+        #ffd54f,
+        #ffd54f 25px,
+        transparent 25px,
+        transparent 50px
+      );
+    }
+
+    .road-lane.bottom .road-markings {
+      top: 60%;
+    }
+
+    .road-lane.top .road-markings {
+      bottom: 60%;
+    }
+
+    .road-shoulder {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 20px;
+      background: #34495e;
+      box-shadow: inset 0 5px 10px rgba(0,0,0,0.3);
+    }
+
+    .road-shoulder::before {
+      content: '';
+      position: absolute;
+      top: 6px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: repeating-linear-gradient(
+        90deg,
+        #78909c,
+        #78909c 10px,
+        transparent 10px,
+        transparent 20px
+      );
+    }
+
+    .road-shoulder.bottom {
+      top: auto;
+      bottom: 0;
+    }
+
+    /* Грузовики с правильным расположением по полосам */
+    .truck {
+      position: fixed;
+      font-size: 3.5rem;
+      z-index: 3;
+      filter: drop-shadow(3px 5px 10px rgba(0,0,0,0.7));
+      text-shadow: 0 0 25px currentColor;
+    }
+
+    /* Грузовики слева направо - НИЖНЯЯ полоса */
+    .truck-right-1 {
+      bottom: 23px;
+      left: -200px;
+      color: #e74c3c;
+      animation: truck-drive-right 12s linear infinite;
+    }
+
+    .truck-right-2 {
+      bottom: 23px;
+      left: -400px;
+      color: #3498db;
+      animation: truck-drive-right 15s linear infinite;
+      animation-delay: 4s;
+    }
+
+    .truck-right-3 {
+      bottom: 23px;
+      left: -300px;
+      color: #2ecc71;
+      animation: truck-drive-right 8s linear infinite;
+      animation-delay: 8s;
+    }
+
+    /* Грузовики справа налево - ВЕРХНЯЯ полоса */
+    .truck-left-1 {
+      bottom: 85px;
+      right: -200px;
+      color: #9b59b6;
+      animation: truck-drive-left 14s linear infinite;
+      transform: scaleX(-1);
+    }
+
+    .truck-left-2 {
+      bottom: 85px;
+      right: -350px;
+      color: #f39c12;
+      animation: truck-drive-left 16s linear infinite;
+      animation-delay: 3s;
+      transform: scaleX(-1);
+    }
+
+    .truck-left-3 {
+      bottom: 85px;
+      right: -250px;
+      color: #1abc9c;
+      animation: truck-drive-left 13s linear infinite;
+      animation-delay: 6s;
+      transform: scaleX(-1);
+    }
+
+    @keyframes truck-drive-right {
+      0% { transform: translateX(0) rotateY(0deg); }
+      100% { transform: translateX(calc(100vw + 400px)) rotateY(0deg); }
+    }
+
+    @keyframes truck-drive-left {
+      0% { transform: translateX(0) scaleX(-1); }
+      100% { transform: translateX(calc(-100vw - 400px)) scaleX(-1); }
+    }
+
+    /* Контейнер формы */
+    .container {
+      position: relative;
+      width: 100%;
+      max-width: 450px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(25px);
+      border-radius: 20px;
+      box-shadow: 
+        0 25px 50px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      overflow: hidden;
+      animation: fadeIn 1s ease-out;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 10;
+      margin: 0 auto;
+      padding: 2.5rem;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .logo {
+      text-align: center;
+      margin: 20px 0 40px;
+      position: relative;
+    }
+
+    .logo i {
+      font-size: 4rem;
+      color: #f39c12;
+      margin-bottom: 20px;
+      display: block;
+      text-shadow: 0 0 30px rgba(243, 156, 18, 0.7);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    .logo h1 {
+      color: white;
+      font-size: 2.5rem;
+      font-weight: 700;
+      text-shadow: 0 2px 15px rgba(0, 0, 0, 0.4);
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, #f39c12, #ffd54f, #f39c12);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% auto;
+      animation: shimmer 3s infinite linear;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 0% center; }
+      100% { background-position: 200% center; }
+    }
+
+    .logo p {
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 1.1rem;
+      margin-top: 5px;
+      font-weight: 300;
+    }
+
+    .login-section {
+      padding: 0 20px;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+      position: relative;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 10px;
+      color: rgba(255, 255, 255, 0.95);
+      font-weight: 500;
+      transition: all 0.3s;
+      font-size: 0.95rem;
+    }
+
+    .input-container {
+      position: relative;
+    }
+
+    .input-container i {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.7);
+      transition: all 0.3s;
+      z-index: 1;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 16px 50px 16px 48px;
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s;
+      background-color: rgba(255, 255, 255, 0.08);
+      color: white;
+      backdrop-filter: blur(10px);
+      cursor: text;
+      pointer-events: auto; /* Разрешаем клики для инпутов */
+    }
+
+    .form-group input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #f39c12;
+      background-color: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.25);
+      transform: translateY(-2px);
+    }
+
+    .form-group input:focus + i {
+      color: #f39c12;
+      transform: translateY(-50%) scale(1.2);
+    }
+
+    /* Улучшенная кнопка скрытия пароля */
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      padding: 8px;
+      z-index: 2;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      pointer-events: auto; /* Разрешаем клики для кнопки */
+    }
+
+    .password-toggle:hover {
+      color: #f39c12;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #f39c12, #e67e22);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 10px;
+      position: relative;
+      overflow: hidden;
+      letter-spacing: 0.5px;
+      box-shadow: 0 6px 20px rgba(230, 126, 34, 0.4);
+      pointer-events: auto; /* Разрешаем клики для кнопки */
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(230, 126, 34, 0.5);
+      background: linear-gradient(135deg, #f1c40f, #f39c12);
+    }
+
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+
+    .error-message {
+      color: #ffb8b8;
+      text-align: center;
+      margin-top: 20px;
+      padding: 12px;
+      border-radius: 8px;
+      background-color: rgba(231, 76, 60, 0.25);
+      display: none;
+      animation: shake 0.5s;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.9rem;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+      20%, 40%, 60%, 80% { transform: translateX(4px); }
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .spinner {
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      border-top: 3px solid #f39c12;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      margin-right: 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.85rem;
+    }
+
+    /* Звезды на небе */
+    .stars {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle 4s infinite;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+
+    /* Луна */
+    .moon {
+      position: fixed;
+      top: 50px;
+      right: 80px;
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle at 30% 30%, #fff, #f5f5f5, #e0e0e0);
+      border-radius: 50%;
+      box-shadow: 
+        0 0 60px rgba(255, 255, 255, 0.8),
+        0 0 100px rgba(255, 255, 255, 0.4);
+      z-index: -1;
+      animation: moon-glow 8s infinite alternate;
+    }
+
+    .moon::before {
+      content: '';
+      position: absolute;
+      top: 15px;
+      left: 20px;
+      width: 20px;
+      height: 20px;
+      background: rgba(200, 200, 200, 0.4);
+      border-radius: 50%;
+      box-shadow: 
+        15px 10px 0 -3px rgba(200, 200, 200, 0.3),
+        30px 30px 0 -5px rgba(200, 200, 200, 0.2);
+    }
+
+    @keyframes moon-glow {
+      0% { box-shadow: 0 0 60px rgba(255, 255, 255, 0.8), 0 0 100px rgba(255, 255, 255, 0.4); }
+      100% { box-shadow: 0 0 80px rgba(255, 255, 255, 0.9), 0 0 120px rgba(255, 255, 255, 0.5); }
+    }
+
+    /* Облака */
+    .cloud {
+      position: fixed;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50px;
+      z-index: -1;
+      animation: cloud-drift 120s linear infinite;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+    }
+
+    .cloud::before, .cloud::after {
+      content: '';
+      position: absolute;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+    }
+
+    @keyframes cloud-drift {
+      0% { transform: translateX(-200px); }
+      100% { transform: translateX(calc(100vw + 200px)); }
+    }
+
+    /* Стили для курсоров */
+    button, 
+    .password-toggle, 
+    .submit-btn {
+      cursor: pointer;
+    }
+
+    input, 
+    textarea {
+      cursor: text;
+    }
+
+    .street-lamp,
+    .lamp-pole,
+    .lamp-arm,
+    .lamp-light,
+    .building,
+    .building-roof,
+    .window,
+    .window-frame,
+    .truck,
+    .moon,
+    .cloud,
+    .star,
+    .road-container,
+    .road,
+    .road-lane,
+    .road-markings,
+    .road-shoulder,
+    .logo i,
+    .logo h1,
+    .logo p,
+    .container,
+    .login-section,
+    .form-group,
+    .input-container,
+    .error-message,
+    .loading,
+    .footer {
+      cursor: default;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 1.5rem;
+        max-width: 350px;
+      }
+      
+      .logo h1 {
+        font-size: 2rem;
+      }
+      
+      .login-section {
+        padding: 0 15px;
+      }
+      
+      .truck {
+        font-size: 2.8rem;
+      }
+      
+      .city-background {
+        padding: 0 10px;
+      }
+      
+      .truck-right-1, .truck-right-2, .truck-right-3 {
+        bottom: 25px;
+      }
+      
+      .truck-left-1, .truck-left-2, .truck-left-3 {
+        bottom: 75px;
+      }
+      
+      .street-lamp {
+        bottom: 140px;
+      }
+      
+      .moon {
+        width: 50px;
+        height: 50px;
+        top: 30px;
+        right: 30px;
+      }
+    }
   </style>
 </head>
 <body>
-  <h2>Авторизация</h2>
-  <form id="login-form">
-    <label>
-      Логин:
-      <input type="text" name="username" required />
-    </label>
-    <label>
-      Пароль:
-      <input type="password" name="password" required />
-    </label>
-    <button type="submit">Войти</button>
-  </form>
+  <!-- Звездное небо -->
+  <div class="stars" id="stars"></div>
+  
+  <!-- Луна -->
+  <div class="moon"></div>
+  
+  <!-- Облака -->
+  <div class="cloud" style="top: 15%; width: 120px; height: 40px; animation-delay: 0s;"></div>
+  <div class="cloud" style="top: 25%; width: 150px; height: 50px; animation-delay: -30s;"></div>
+  <div class="cloud" style="top: 10%; width: 100px; height: 35px; animation-delay: -60s;"></div>
+  
+  <!-- Городской фон с множеством зданий -->
+  <div class="city-background" id="city-background">
+    <!-- Здания будут созданы через JavaScript -->
+  </div>
+  
+  <!-- Улучшенные компактные фонари -->
+  <div class="street-lamp" style="left: 12%;">
+    <div class="lamp-pole">
+      <div class="lamp-arm"></div>
+      <div class="lamp-light"></div>
+    </div>
+  </div>
+  <div class="street-lamp" style="left: 37%;">
+    <div class="lamp-pole">
+      <div class="lamp-arm"></div>
+      <div class="lamp-light"></div>
+    </div>
+  </div>
+  <div class="street-lamp" style="left: 62%;">
+    <div class="lamp-pole">
+      <div class="lamp-arm"></div>
+      <div class="lamp-light"></div>
+    </div>
+  </div>
+  <div class="street-lamp" style="left: 87%;">
+    <div class="lamp-pole">
+      <div class="lamp-arm"></div>
+      <div class="lamp-light"></div>
+    </div>
+  </div>
+  
+  <!-- Грузовики слева направо - НИЖНЯЯ полоса -->
+  <div class="truck truck-right-1">
+    <i class="fas fa-truck-moving"></i>
+  </div>
+  
+  <div class="truck truck-right-2">
+    <i class="fas fa-truck"></i>
+  </div>
+  
+  <div class="truck truck-right-3">
+    <i class="fas fa-shipping-fast"></i>
+  </div>
+  
+  <!-- Грузовики справа налево - ВЕРХНЯЯ полоса -->
+  <div class="truck truck-left-1">
+    <i class="fas fa-truck-moving"></i>
+  </div>
+  
+  <div class="truck truck-left-2">
+    <i class="fas fa-truck"></i>
+  </div>
+  
+  <div class="truck truck-left-3">
+    <i class="fas fa-shipping-fast"></i>
+  </div>
+  
+  <!-- Дорога с двумя полосами -->
+  <div class="road-container">
+    <div class="road">
+      <!-- Нижняя полоса (слева направо) -->
+      <div class="road-lane bottom left">
+        <div class="road-markings"></div>
+      </div>
+      <div class="road-lane bottom right">
+        <div class="road-markings"></div>
+      </div>
+      
+      <!-- Верхняя полоса (справа налево) -->
+      <div class="road-lane top left">
+        <div class="road-markings"></div>
+      </div>
+      <div class="road-lane top right">
+        <div class="road-markings"></div>
+      </div>
+      
+      <div class="road-shoulder"></div>
+      <div class="road-shoulder bottom"></div>
+    </div>
+  </div>
 
-  <p id="error"></p>
+  <div class="container">
+    <div class="logo">
+      <i class="fas fa-shipping-fast"></i>
+      <h1>CargoDrip</h1>
+      <p>Умная логистика грузоперевозок</p>
+    </div>
+    
+    <div class="login-section">
+      <h2 style="color: white; margin-bottom: 30px; text-align: center; font-size: 1.5rem; font-weight: 500; letter-spacing: 0.5px;">Авторизация</h2>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="username">Имя пользователя</label>
+          <div class="input-container">
+            <i class="fas fa-user"></i>
+            <input type="text" id="username" name="username" required placeholder="Введите ваше имя пользователя">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Пароль</label>
+          <div class="input-container">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="password" name="password" required placeholder="Введите ваш пароль">
+            <button type="button" class="password-toggle" id="password-toggle">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        
+        <button type="submit" class="submit-btn">Войти в систему</button>
+        
+        <div class="loading" id="loading">
+          <span class="spinner"></span> Выполняется аутентификация...
+        </div>
+        
+        <div class="error-message" id="error"></div>
+      </form>
+      
+      <div class="footer">
+        <p>Система управления грузоперевозками</p>
+      </div>
+    </div>
+  </div>
 
   <script>
+    // Создание звездного неба
+    function createStars() {
+      const container = document.getElementById('stars');
+      
+      for (let i = 0; i < 250; i++) {
+        const star = document.createElement('div');
+        star.classList.add('star');
+        
+        const size = Math.random() * 2 + 1;
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.top = `${Math.random() * 70}%`;
+        star.style.animationDelay = `${Math.random() * 4}s`;
+        star.style.opacity = Math.random() * 0.7 + 0.3;
+        
+        container.appendChild(star);
+      }
+    }
 
+    // Создание улучшенных зданий без громоотводов
+    function createCity() {
+      const container = document.getElementById('city-background');
+      const buildingCount = 8;
+      const buildingWidths = [80, 100, 120, 90, 110, 95, 85, 105];
+      const buildingHeights = [250, 300, 200, 350, 280, 320, 270, 290];
+      
+      for (let i = 0; i < buildingCount; i++) {
+        const building = document.createElement('div');
+        building.classList.add('building');
+        
+        const width = buildingWidths[i];
+        const height = buildingHeights[i];
+        
+        building.style.width = `${width}px`;
+        building.style.height = `${height}px`;
+        building.style.flex = `0 0 ${width}px`;
+        
+        // Добавляем улучшенную крышу
+        const roof = document.createElement('div');
+        roof.classList.add('building-roof');
+        building.appendChild(roof);
+        
+        // Равномерное распределение окон по всему зданию
+        const windowRows = Math.floor((height - 80) / 35);
+        const windowCols = Math.floor((width - 20) / 25);
+        
+        const startY = 40;
+        const startX = 10;
+        
+        for (let row = 0; row < windowRows; row++) {
+          for (let col = 0; col < windowCols; col++) {
+            // Создаем рамку окна
+            const windowFrame = document.createElement('div');
+            windowFrame.classList.add('window-frame');
+            
+            const frameWidth = 20;
+            const frameHeight = 28;
+            const frameLeft = startX + col * 25;
+            const frameTop = startY + row * 35;
+            
+            windowFrame.style.width = `${frameWidth}px`;
+            windowFrame.style.height = `${frameHeight}px`;
+            windowFrame.style.left = `${frameLeft}px`;
+            windowFrame.style.top = `${frameTop}px`;
+            building.appendChild(windowFrame);
+            
+            // Создаем само окно
+            const window = document.createElement('div');
+            window.classList.add('window');
+            
+            const windowWidth = 14;
+            const windowHeight = 20;
+            const windowLeft = startX + col * 25 + 3;
+            const windowTop = startY + row * 35 + 4;
+            
+            window.style.width = `${windowWidth}px`;
+            window.style.height = `${windowHeight}px`;
+            window.style.left = `${windowLeft}px`;
+            window.style.top = `${windowTop}px`;
+            
+            // Случайное включение/выключение окон
+            if (Math.random() > 0.3) {
+              window.style.background = 'linear-gradient(135deg, #ffeb3b, #fbc02d)';
+              window.style.animation = `twinkle ${Math.random() * 8 + 4}s infinite`;
+            } else {
+              window.style.background = '#37474f';
+              window.style.boxShadow = 'inset 0 2px 5px rgba(0,0,0,0.5)';
+            }
+            
+            building.appendChild(window);
+          }
+        }
+        
+        container.appendChild(building);
+      }
+    }
+
+    // Создание облаков
+    function createClouds() {
+      const body = document.querySelector('body');
+      for (let i = 0; i < 5; i++) {
+        const cloud = document.createElement('div');
+        cloud.classList.add('cloud');
+        
+        const width = Math.random() * 100 + 80;
+        const height = width * 0.3;
+        const top = Math.random() * 30 + 5;
+        const delay = Math.random() * 100;
+        
+        cloud.style.width = `${width}px`;
+        cloud.style.height = `${height}px`;
+        cloud.style.top = `${top}%`;
+        cloud.style.animationDelay = `-${delay}s`;
+        
+        // Создание формы облака
+        cloud.style.borderRadius = `${height}px`;
+        
+        cloud.innerHTML = `
+          <style>
+            .cloud:nth-child(${i+1})::before {
+              content: '';
+              position: absolute;
+              top: -${height/2}px;
+              left: ${width/4}px;
+              width: ${width/2}px;
+              height: ${width/2}px;
+              background: rgba(255, 255, 255, 0.1);
+              border-radius: 50%;
+            }
+            .cloud:nth-child(${i+1})::after {
+              content: '';
+              position: absolute;
+              top: -${height/3}px;
+              right: ${width/4}px;
+              width: ${width/3}px;
+              height: ${width/3}px;
+              background: rgba(255, 255, 255, 0.1);
+              border-radius: 50%;
+            }
+          </style>
+        `;
+        
+        body.appendChild(cloud);
+      }
+    }
+
+    // Переключение видимости пароля
+    function setupPasswordToggle() {
+      const passwordToggle = document.getElementById('password-toggle');
+      const passwordInput = document.getElementById('password');
+      const passwordIcon = passwordToggle.querySelector('i');
+      
+      passwordToggle.addEventListener('click', () => {
+        if (passwordInput.type === 'password') {
+          passwordInput.type = 'text';
+          passwordIcon.classList.remove('fa-eye');
+          passwordIcon.classList.add('fa-eye-slash');
+        } else {
+          passwordInput.type = 'password';
+          passwordIcon.classList.remove('fa-eye-slash');
+          passwordIcon.classList.add('fa-eye');
+        }
+      });
+    }
+
+    // Анимация при фокусе на поле ввода
+    function setupInputAnimations() {
+      const inputs = document.querySelectorAll('input');
+      
+      inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+          this.parentElement.parentElement.querySelector('label').style.color = '#f39c12';
+          this.parentElement.querySelector('i').style.color = '#f39c12';
+        });
+        
+        input.addEventListener('blur', function() {
+          if (!this.value) {
+            this.parentElement.parentElement.querySelector('label').style.color = 'rgba(255, 255, 255, 0.95)';
+            this.parentElement.querySelector('i').style.color = 'rgba(255, 255, 255, 0.7)';
+          }
+        });
+      });
+    }
+
+    // Логика авторизации через API с ролями
     const form = document.getElementById("login-form");
     const error = document.getElementById("error");
+    const loading = document.getElementById("loading");
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      error.textContent = "";
+      error.style.display = "none";
+      loading.style.display = "block";
+      
+      // Анимация кнопки
+      const submitBtn = document.querySelector('.submit-btn');
+      submitBtn.disabled = true;
+      submitBtn.style.opacity = '0.7';
 
       const formData = new FormData(form);
       const payload = {
@@ -43,6 +1103,7 @@
       };
 
       try {
+        // Отправляем запрос на сервер для аутентификации
         const res = await fetch("/auth/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -54,17 +1115,82 @@
         }
 
         const data = await res.json();
+        
+        // Сохраняем токен и роль в localStorage
         localStorage.setItem("token", data.access_token);
         localStorage.setItem("role", data.role);
+        localStorage.setItem("username", data.username);
 
-        if (data.redirect_url && typeof data.redirect_url === "string") {
-          window.location.href = data.redirect_url;
-        } else {
-          error.textContent = "Ошибка: не удалось определить маршрут перенаправления.";
-        }
+        // Анимация успешного входа
+        setTimeout(() => {
+          document.querySelector('.container').style.animation = 'fadeOut 0.5s ease forwards';
+          setTimeout(() => {
+            // Перенаправление в зависимости от роли
+            if (data.redirect_url && typeof data.redirect_url === "string") {
+              window.location.href = data.redirect_url;
+            } else {
+              // Если redirect_url не предоставлен, перенаправляем по умолчанию
+              switch(data.role) {
+                case 'admin':
+                  window.location.href = "/admin_dashboard";
+                  break;
+                case 'driver':
+                  window.location.href = "/driver_dashboard";
+                  break;
+                default:
+                  window.location.href = "dashboard.html";
+              }
+            }
+          }, 500);
+        }, 1000);
 
       } catch (err) {
         error.textContent = err.message;
+        error.style.display = "block";
+        loading.style.display = "none";
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = '1';
+        
+        form.style.animation = 'shake 0.5s ease';
+        setTimeout(() => {
+          form.style.animation = '';
+        }, 500);
+      }
+    });
+
+    // Добавляем ключевые кадры для анимаций
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes fadeOut {
+        to { opacity: 0; transform: scale(0.9); }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Инициализация после загрузки DOM
+    document.addEventListener('DOMContentLoaded', () => {
+      createStars();
+      createCity();
+      createClouds();
+      setupPasswordToggle();
+      setupInputAnimations();
+      
+      // Проверяем, если пользователь уже авторизован
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("role");
+      
+      if (token && role) {
+        // Автоматическое перенаправление в зависимости от роли
+        switch(role) {
+          case 'admin':
+            window.location.href = "/admin_dashboard";
+            break;
+          case 'driver':
+            window.location.href = "/driver_dashboard";
+            break;
+          default:
+            // Оставляем на странице входа
+        }
       }
     });
   </script>

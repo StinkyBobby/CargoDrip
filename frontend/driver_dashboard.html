@@ -2,14 +2,1206 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Панель водителя</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Панель водителя | CargoDrip Беларусь</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body { font-family: sans-serif; padding: 20px; }
-    h2 { color: #333; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    :root {
+      --primary: #f39c12;
+      --primary-dark: #e67e22;
+      --secondary: #3498db;
+      --success: #2ecc71;
+      --danger: #e74c3c;
+      --warning: #f1c40f;
+      --dark: #1a5276;
+      --darker: #2c3e50;
+      --light: rgba(255, 255, 255, 0.9);
+      --lighter: rgba(255, 255, 255, 0.7);
+    }
+
+    body {
+      background: linear-gradient(135deg, var(--dark), var(--darker), var(--dark));
+      background-size: 400% 400%;
+      animation: gradient 15s ease infinite;
+      min-height: 100vh;
+      color: white;
+    }
+
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .header {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      padding: 20px 30px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .logo i {
+      font-size: 2.5rem;
+      color: var(--primary);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    .logo h1 {
+      font-size: 1.8rem;
+      background: linear-gradient(90deg, var(--primary), #ffd54f);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .logout-btn {
+      padding: 12px 25px;
+      background: linear-gradient(135deg, var(--danger), #c0392b);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+    }
+
+    .logout-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(231, 76, 60, 0.5);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 30px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 25px;
+      margin-bottom: 35px;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      padding: 25px;
+      border-radius: 16px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.4s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+    }
+
+    .stat-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: var(--primary);
+      margin-bottom: 12px;
+      text-shadow: 0 2px 10px rgba(243, 156, 18, 0.3);
+    }
+
+    .stat-label {
+      color: var(--lighter);
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    .section-title {
+      font-size: 1.8rem;
+      margin-bottom: 25px;
+      color: var(--primary);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary), transparent);
+      border-radius: 2px;
+    }
+
+    .requests-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 25px;
+      margin-bottom: 40px;
+    }
+
+    .request-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border-radius: 16px;
+      padding: 25px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.4s;
+      position: relative;
+    }
+
+    .request-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+    }
+
+    .request-card.truck-assigned {
+      border-color: var(--success);
+      background: rgba(46, 204, 113, 0.05);
+    }
+
+    .request-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .request-id {
+      font-size: 0.9rem;
+      color: var(--lighter);
+      font-weight: 500;
+    }
+
+    .status-badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-assigned {
+      background: rgba(243, 156, 18, 0.15);
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+
+    .status-in-progress {
+      background: rgba(52, 152, 219, 0.15);
+      color: var(--secondary);
+      border: 1px solid var(--secondary);
+    }
+
+    .status-completed {
+      background: rgba(46, 204, 113, 0.15);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    .route-info {
+      margin-bottom: 20px;
+    }
+
+    .route-from, .route-to {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+      padding: 8px 0;
+    }
+
+    .cargo-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .cargo-detail {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      color: var(--light);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .cargo-description {
+      margin-bottom: 20px;
+      color: var(--lighter);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    .select-truck-btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, var(--secondary), #2980b9);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+    }
+
+    .select-truck-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(52, 152, 219, 0.5);
+    }
+
+    .change-truck-btn {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, var(--warning), #f39c12);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+      margin-top: 10px;
+    }
+
+    .change-truck-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(243, 156, 18, 0.5);
+    }
+
+    .select-truck-btn:disabled {
+      background: rgba(255, 255, 255, 0.2);
+      color: rgba(255, 255, 255, 0.5);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Модальное окно */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(15px);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      animation: modalFadeIn 0.3s ease;
+      padding: 20px;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, rgba(26, 32, 53, 0.95), rgba(21, 35, 71, 0.95));
+      backdrop-filter: blur(30px);
+      padding: 40px;
+      border-radius: 24px;
+      width: 90%;
+      max-width: 700px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6);
+      position: relative;
+      animation: modalSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes modalSlideIn {
+      from { transform: translateY(-60px) scale(0.9); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .modal-content::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--primary-dark), var(--warning));
+      border-radius: 24px 24px 0 0;
+    }
+
+    .modal-title {
+      color: var(--primary);
+      margin-bottom: 30px;
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 25px;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: var(--lighter);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close:hover {
+      color: var(--danger);
+      background: rgba(231, 76, 60, 0.15);
+      transform: rotate(90deg) scale(1.1);
+    }
+
+    .trucks-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 25px;
+      max-height: 400px;
+      overflow-y: auto;
+      padding: 10px;
+    }
+
+    .truck-card {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    .truck-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(243, 156, 18, 0.3);
+    }
+
+    .truck-card.selected {
+      border-color: var(--success);
+      background: rgba(46, 204, 113, 0.1);
+      transform: translateY(-3px);
+    }
+
+    .truck-card.unavailable {
+      border-color: var(--danger);
+      background: rgba(231, 76, 60, 0.1);
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .truck-card.unavailable:hover {
+      transform: none;
+      box-shadow: none;
+      border-color: var(--danger);
+    }
+
+    .truck-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 12px;
+    }
+
+    .truck-icon {
+      font-size: 2rem;
+      color: var(--primary);
+    }
+
+    .truck-details {
+      flex: 1;
+    }
+
+    .truck-model {
+      font-weight: bold;
+      margin-bottom: 5px;
+      font-size: 1.1rem;
+    }
+
+    .truck-specs {
+      font-size: 0.85rem;
+      color: var(--lighter);
+      line-height: 1.4;
+    }
+
+    .truck-status {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .status-available {
+      background: rgba(46, 204, 113, 0.2);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    .status-busy {
+      background: rgba(231, 76, 60, 0.2);
+      color: var(--danger);
+      border: 1px solid var(--danger);
+    }
+
+    .truck-id {
+      font-size: 0.8rem;
+      color: var(--lighter);
+      text-align: center;
+      padding: 5px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      margin-top: 8px;
+    }
+
+    .confirm-btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, var(--success), #27ae60);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+    }
+
+    .confirm-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(46, 204, 113, 0.5);
+    }
+
+    .confirm-btn:disabled {
+      background: rgba(255, 255, 255, 0.2);
+      color: rgba(255, 255, 255, 0.5);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .no-trucks {
+      text-align: center;
+      padding: 40px;
+      color: var(--lighter);
+    }
+
+    .no-trucks i {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    .current-requests {
+      margin-top: 40px;
+    }
+
+    .my-requests {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 25px;
+      margin-top: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 50px;
+      color: var(--lighter);
+    }
+
+    .empty-state i {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    .assigned-truck-info {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(46, 204, 113, 0.3);
+    }
+
+    .assigned-truck-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .current-truck {
+      font-weight: 600;
+      color: var(--success);
+    }
+
+    /* Уведомления */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      border-radius: 12px;
+      color: white;
+      font-weight: 600;
+      z-index: 1001;
+      transform: translateX(400px);
+      transition: transform 0.3s ease;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .notification.show {
+      transform: translateX(0);
+    }
+
+    .notification.success {
+      background: linear-gradient(135deg, var(--success), #27ae60);
+    }
+
+    .notification.error {
+      background: linear-gradient(135deg, var(--danger), #c0392b);
+    }
+
+    .notification.info {
+      background: linear-gradient(135deg, var(--secondary), #2980b9);
+    }
+
+    /* Адаптивность */
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+      }
+      
+      .requests-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      }
+      
+      .modal-content {
+        padding: 25px 20px;
+      }
+      
+      .trucks-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
-  <h2>Добро пожаловать, водитель!</h2>
-  <p>Здесь вы можете просматривать свои маршруты, задания и статус доставки.</p>
+  <!-- Уведомления -->
+  <div class="notification" id="notification"></div>
+
+  <div class="header">
+    <div class="logo">
+      <i class="fas fa-truck-fast"></i>
+      <h1>CargoDrip Беларусь</h1>
+    </div>
+    <div class="user-info">
+      <span style="color: var(--primary); font-weight: 600;" id="driver-name">Водитель</span>
+      <button class="logout-btn" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i> Выйти
+      </button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-number" id="assigned-requests">0</div>
+        <div class="stat-label">Назначенные заявки</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="active-requests">0</div>
+        <div class="stat-label">Активные заявки</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="completed-requests">0</div>
+        <div class="stat-label">Завершенные заявки</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">
+      <i class="fas fa-clipboard-list"></i> Мои назначенные заявки
+    </h2>
+    
+    <div class="requests-grid" id="requests-grid">
+      <div class="empty-state">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Загрузка заявок...</p>
+      </div>
+    </div>
+
+    <div class="current-requests">
+      <h2 class="section-title">
+        <i class="fas fa-tasks"></i> Заявки в процессе выполнения
+      </h2>
+      <div class="my-requests" id="my-requests">
+        <div class="empty-state">
+          <i class="fas fa-spinner fa-spin"></i>
+          <p>Загрузка активных заявок...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно выбора транспортного средства -->
+  <div class="modal" id="truck-selection-modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()">
+        <i class="fas fa-times"></i>
+      </button>
+      <h2 class="modal-title">
+        <i class="fas fa-truck"></i> Выберите транспортное средство
+      </h2>
+      <div class="trucks-grid" id="trucks-grid">
+        <div class="empty-state">
+          <i class="fas fa-spinner fa-spin"></i>
+          <p>Загрузка транспорта...</p>
+        </div>
+      </div>
+      <div class="no-trucks" id="no-trucks-message" style="display: none;">
+        <i class="fas fa-truck-moving"></i>
+        <p>Нет доступных транспортных средств</p>
+        <p style="font-size: 0.9rem; margin-top: 10px;">Все транспортные средства заняты или не подходят по параметрам</p>
+      </div>
+      <button class="confirm-btn" id="confirm-selection" disabled>
+        <i class="fas fa-check"></i> Подтвердить выбор
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Конфигурация API
+    const API_BASE = "http://localhost:8000";
+    let currentDriver = null;
+    let cargoRequests = [];
+    let trucks = [];
+    let currentRequestId = null;
+    let selectedTruckId = null;
+
+    // Функция для показа уведомлений
+    function showNotification(message, type = 'info') {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.className = `notification ${type} show`;
+      
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 3000);
+    }
+
+    // Проверка авторизации
+    function checkAuth() {
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("role");
+      
+      if (!token || role !== 'driver') {
+        window.location.href = 'login.html';
+        return false;
+      }
+      
+      return true;
+    }
+
+    // Загрузка данных водителя
+    async function loadDriverData() {
+      try {
+        if (!checkAuth()) return;
+
+        const token = localStorage.getItem('token');
+        
+        // Загружаем профиль водителя
+        const response = await fetch(`${API_BASE}/driver/profile`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.ok) {
+          currentDriver = await response.json();
+          document.getElementById('driver-name').textContent = 
+            `${currentDriver.name} ${currentDriver.surname}`;
+        } else {
+          throw new Error('Не удалось загрузить данные водителя');
+        }
+
+        // Загружаем заявки и транспорт
+        await Promise.all([
+          loadCargoRequests(),
+          loadTrucks()
+        ]);
+
+      } catch (error) {
+        console.error('Ошибка загрузки данных:', error);
+        showNotification('Ошибка загрузки данных: ' + error.message, 'error');
+      }
+    }
+
+    // Загрузка заявок из БД
+    async function loadCargoRequests() {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_BASE}/driver/cargo-requests`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          cargoRequests = data.items || [];
+          updateUI();
+        } else {
+          throw new Error('Ошибка загрузки заявок');
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки заявок:', error);
+        showNotification('Ошибка загрузки заявок: ' + error.message, 'error');
+      }
+    }
+
+    // Загрузка транспорта из БД
+    async function loadTrucks() {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_BASE}/trucks`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          trucks = data.items || [];
+        } else {
+          throw new Error('Ошибка загрузки транспорта');
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки транспорта:', error);
+        showNotification('Ошибка загрузки транспорта: ' + error.message, 'error');
+      }
+    }
+
+    // Обновление статистики
+    function updateStats() {
+      if (!currentDriver) return;
+
+      const assignedRequests = cargoRequests.filter(req => 
+        req.driver_id === currentDriver.id && req.status === "назначена"
+      ).length;
+      
+      const activeRequests = cargoRequests.filter(req => 
+        req.driver_id === currentDriver.id && req.status === "в процессе"
+      ).length;
+      
+      const completedRequests = cargoRequests.filter(req => 
+        req.driver_id === currentDriver.id && req.status === "завершено"
+      ).length;
+
+      document.getElementById('assigned-requests').textContent = assignedRequests;
+      document.getElementById('active-requests').textContent = activeRequests;
+      document.getElementById('completed-requests').textContent = completedRequests;
+    }
+
+    // Проверка соответствия груза и транспорта
+    function isTruckSuitableForCargo(truck, cargoWeight, cargoVolume) {
+      const weightOk = truck.capacity_kg >= cargoWeight;
+      const volumeOk = truck.volume_m3 >= cargoVolume;
+      
+      return {
+        suitable: weightOk && volumeOk,
+        weightOk: weightOk,
+        volumeOk: volumeOk
+      };
+    }
+
+    // Отображение назначенных заявок
+    function displayAssignedRequests() {
+      const grid = document.getElementById('requests-grid');
+      
+      if (!currentDriver) return;
+
+      const assignedRequests = cargoRequests.filter(req => 
+        req.driver_id === currentDriver.id && req.status === "назначена"
+      );
+
+      if (assignedRequests.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-clipboard-list"></i>
+            <p>Нет назначенных заявок</p>
+            <p style="font-size: 0.9rem; margin-top: 10px;">Администратор назначит вам заявки для выполнения</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = assignedRequests.map(request => `
+        <div class="request-card">
+          <div class="request-header">
+            <span class="request-id">Заявка #${request.id}</span>
+            <span class="status-badge status-assigned">Назначена</span>
+          </div>
+          <div class="route-info">
+            <div class="route-from">
+              <i class="fas fa-map-marker-alt" style="color: var(--danger);"></i>
+              <span><strong>Откуда:</strong> ${request.from_location}</span>
+            </div>
+            <div class="route-to">
+              <i class="fas fa-flag" style="color: var(--success);"></i>
+              <span><strong>Куда:</strong> ${request.to_location}</span>
+            </div>
+          </div>
+          <div class="cargo-info">
+            <div class="cargo-detail">
+              <i class="fas fa-weight-hanging"></i>
+              <span>Вес: ${request.weight} кг</span>
+            </div>
+            <div class="cargo-detail">
+              <i class="fas fa-arrows-alt-v"></i>
+              <span>Объем: ${request.volume} м³</span>
+            </div>
+          </div>
+          <div class="cargo-description">
+            <strong>Описание груза:</strong> ${request.description}
+          </div>
+          <button class="select-truck-btn" onclick="openTruckSelection(${request.id})">
+            <i class="fas fa-truck"></i> Выбрать транспорт
+          </button>
+        </div>
+      `).join('');
+    }
+
+    // Отображение активных заявок водителя
+    function displayActiveRequests() {
+      const container = document.getElementById('my-requests');
+      
+      if (!currentDriver) return;
+
+      const activeRequests = cargoRequests.filter(req => 
+        req.driver_id === currentDriver.id && req.status === "в процессе"
+      );
+
+      if (activeRequests.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-tasks"></i>
+            <p>Нет активных заявок</p>
+            <p style="font-size: 0.9rem; margin-top: 10px;">Выберите транспорт для назначенных заявок чтобы начать выполнение</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = activeRequests.map(request => {
+        const assignedTruck = trucks.find(truck => truck.id === request.truck_id);
+        return `
+          <div class="request-card truck-assigned">
+            <div class="request-header">
+              <span class="request-id">Заявка #${request.id}</span>
+              <span class="status-badge status-in-progress">В процессе</span>
+            </div>
+            ${assignedTruck ? `
+              <div class="assigned-truck-info">
+                <div class="assigned-truck-header">
+                  <span class="current-truck">
+                    <i class="fas fa-truck"></i> Текущий транспорт:
+                  </span>
+                  <span class="status-badge status-available">Активен</span>
+                </div>
+                <div style="margin-top: 8px;">
+                  <strong>${assignedTruck.model}</strong> (${assignedTruck.plate_number})<br>
+                  <small>Грузоподъемность: ${assignedTruck.capacity_kg}кг, Объем: ${assignedTruck.volume_m3}м³</small>
+                </div>
+              </div>
+            ` : ''}
+            <div class="route-info">
+              <div class="route-from">
+                <i class="fas fa-map-marker-alt" style="color: var(--danger);"></i>
+                <span><strong>Откуда:</strong> ${request.from_location}</span>
+              </div>
+              <div class="route-to">
+                <i class="fas fa-flag" style="color: var(--success);"></i>
+                <span><strong>Куда:</strong> ${request.to_location}</span>
+              </div>
+            </div>
+            <div class="cargo-info">
+              <div class="cargo-detail">
+                <i class="fas fa-weight-hanging"></i>
+                <span>Вес: ${request.weight} кг</span>
+              </div>
+              <div class="cargo-detail">
+                <i class="fas fa-arrows-alt-v"></i>
+                <span>Объем: ${request.volume} м³</span>
+              </div>
+            </div>
+            <div class="cargo-description">
+              <strong>Описание груза:</strong> ${request.description}
+            </div>
+            <button class="change-truck-btn" onclick="openTruckSelection(${request.id}, true)">
+              <i class="fas fa-exchange-alt"></i> Сменить транспорт
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Обновление всего UI
+    function updateUI() {
+      updateStats();
+      displayAssignedRequests();
+      displayActiveRequests();
+    }
+
+    // Открытие модального окна выбора транспорта
+    async function openTruckSelection(requestId, changing = false) {
+      currentRequestId = requestId;
+      selectedTruckId = null;
+      
+      const modal = document.getElementById('truck-selection-modal');
+      const trucksGrid = document.getElementById('trucks-grid');
+      const noTrucksMessage = document.getElementById('no-trucks-message');
+      const confirmBtn = document.getElementById('confirm-selection');
+      
+      const request = cargoRequests.find(req => req.id === requestId);
+      
+      // Сбрасываем состояние
+      confirmBtn.disabled = true;
+      confirmBtn.innerHTML = '<i class="fas fa-check"></i> Подтвердить выбор';
+      
+      // Показываем загрузку
+      trucksGrid.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Загрузка транспорта...</p></div>';
+
+      modal.style.display = 'flex';
+
+      try {
+        // Фильтруем доступные транспортные средства
+        const availableTrucks = trucks.filter(truck => {
+          if (!truck.available && truck.id !== request.truck_id) return false;
+          
+          const suitability = isTruckSuitableForCargo(truck, request.weight, request.volume);
+          return suitability.suitable;
+        });
+        
+        if (availableTrucks.length === 0) {
+          trucksGrid.style.display = 'none';
+          noTrucksMessage.style.display = 'block';
+        } else {
+          trucksGrid.style.display = 'grid';
+          noTrucksMessage.style.display = 'none';
+          
+          trucksGrid.innerHTML = availableTrucks.map(truck => {
+            const suitability = isTruckSuitableForCargo(truck, request.weight, request.volume);
+            const isCurrentlyAssigned = request.truck_id === truck.id;
+            const isAvailable = truck.available || isCurrentlyAssigned;
+            
+            return `
+              <div class="truck-card ${isCurrentlyAssigned ? 'selected' : ''} ${!isAvailable ? 'unavailable' : ''}" 
+                   onclick="${isAvailable ? `selectTruck(${truck.id})` : ''}">
+                <div class="truck-info">
+                  <i class="fas fa-truck truck-icon"></i>
+                  <div class="truck-details">
+                    <div class="truck-model">${truck.model}</div>
+                    <div class="truck-specs">
+                      Грузоподъемность: ${truck.capacity_kg}кг<br>
+                      Объем: ${truck.volume_m3}м³
+                    </div>
+                  </div>
+                  <span class="truck-status ${isAvailable ? 'status-available' : 'status-busy'}">
+                    ${isAvailable ? 'Свободен' : 'Занят'}
+                  </span>
+                </div>
+                <div class="truck-id">${truck.plate_number}</div>
+                ${isCurrentlyAssigned ? '<div style="text-align: center; margin-top: 8px; color: var(--success);"><i class="fas fa-check-circle"></i> Текущий транспорт</div>' : ''}
+              </div>
+            `;
+          }).join('');
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки транспорта:', error);
+        trucksGrid.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Ошибка загрузки транспорта</p></div>';
+      }
+    }
+
+    // Выбор транспортного средства
+    function selectTruck(truckId) {
+      selectedTruckId = truckId;
+      
+      // Снимаем выделение со всех карточек
+      document.querySelectorAll('.truck-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      
+      // Выделяем выбранную карточку
+      const selectedCard = document.querySelector(`.truck-card[onclick="selectTruck(${truckId})"]`);
+      if (selectedCard) {
+        selectedCard.classList.add('selected');
+      }
+      
+      // Активируем кнопку подтверждения
+      document.getElementById('confirm-selection').disabled = false;
+    }
+
+    // Подтверждение выбора транспорта
+    async function confirmSelection() {
+      if (currentRequestId && selectedTruckId) {
+        try {
+          const confirmBtn = document.getElementById('confirm-selection');
+          confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Сохранение...';
+          confirmBtn.disabled = true;
+
+          const token = localStorage.getItem('token');
+
+          // Обновляем заявку в БД
+          const response = await fetch(`${API_BASE}/cargo-requests/${currentRequestId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              truck_id: selectedTruckId,
+              status: 'в процессе'
+            })
+          });
+
+          if (response.ok) {
+            // Перезагружаем данные
+            await loadCargoRequests();
+            await loadTrucks();
+            
+            showNotification('Транспорт успешно назначен на заявку', 'success');
+            closeModal();
+          } else {
+            throw new Error('Ошибка назначения транспорта');
+          }
+        } catch (error) {
+          console.error('Ошибка назначения транспорта:', error);
+          showNotification('Ошибка назначения транспорта: ' + error.message, 'error');
+          
+          // Восстанавливаем кнопку
+          const confirmBtn = document.getElementById('confirm-selection');
+          confirmBtn.innerHTML = '<i class="fas fa-check"></i> Подтвердить выбор';
+          confirmBtn.disabled = false;
+        }
+      }
+    }
+
+    // Закрытие модального окна
+    function closeModal() {
+      document.getElementById('truck-selection-modal').style.display = 'none';
+    }
+
+    // Выход из системы
+    function logout() {
+      if (confirm('Вы уверены, что хотите выйти?')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        localStorage.removeItem('username');
+        window.location.href = 'login.html';
+      }
+    }
+
+    // Инициализация при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+      loadDriverData();
+      
+      // Назначаем обработчик для кнопки подтверждения
+      document.getElementById('confirm-selection').addEventListener('click', confirmSelection);
+      
+      // Закрытие модального окна при клике вне его
+      window.addEventListener('click', function(event) {
+        const modal = document.getElementById('truck-selection-modal');
+        if (event.target === modal) {
+          closeModal();
+        }
+      });
+    });
+  </script>
 </body>
 </html>

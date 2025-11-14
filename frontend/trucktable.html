@@ -3,132 +3,886 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Грузовики</title>
+  <title>Управление грузовиками | CargoDrip</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #0a1429, #152347, #0a1429);
+      background-size: 400% 400%;
+      animation: gradient 18s ease infinite;
       min-height: 100vh;
-      padding: 2rem;
+      padding: 20px;
+      overflow-x: hidden;
+      position: relative;
     }
+
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Городской фон с улучшенными зданиями */
+    .city-background {
+      position: fixed;
+      bottom: 120px;
+      left: 0;
+      width: 100%;
+      height: 400px;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding: 0 20px;
+    }
+
+    .building {
+      position: relative;
+      background: linear-gradient(to top, #1a237e, #283593, #303f9f);
+      border-left: 3px solid #5c6bc0;
+      border-right: 3px solid #5c6bc0;
+      box-shadow: 
+        inset 0 -15px 30px rgba(0,0,0,0.4),
+        0 5px 15px rgba(0,0,0,0.3);
+      margin: 0 10px;
+    }
+
+    /* Улучшенные реалистичные крыши */
+    .building-roof {
+      position: absolute;
+      top: -25px;
+      left: -10px;
+      width: calc(100% + 20px);
+      height: 25px;
+      background: linear-gradient(45deg, #b71c1c, #c62828, #d32f2f);
+      clip-path: polygon(0 100%, 2% 70%, 5% 40%, 10% 20%, 20% 10%, 80% 10%, 90% 20%, 95% 40%, 98% 70%, 100% 100%);
+      box-shadow: 
+        0 5px 15px rgba(0,0,0,0.5),
+        inset 0 2px 5px rgba(255,255,255,0.1);
+      border-bottom: 3px solid #8e0000;
+    }
+
+    .building-roof::before {
+      content: '';
+      position: absolute;
+      top: 5px;
+      left: 20%;
+      right: 20%;
+      height: 8px;
+      background: linear-gradient(90deg, transparent, #ff8a65, transparent);
+      border-radius: 4px;
+      box-shadow: 0 0 10px #ff8a65;
+    }
+
+    .window {
+      position: absolute;
+      background: linear-gradient(135deg, #ffeb3b, #fbc02d);
+      border-radius: 3px;
+      box-shadow: 
+        0 0 12px rgba(255, 235, 59, 0.7),
+        inset 0 2px 4px rgba(255, 255, 255, 0.4);
+      transition: all 0.5s ease;
+      border: 1px solid #ffd54f;
+    }
+
+    .window:hover {
+      background: linear-gradient(135deg, #ffd54f, #ffb300);
+      box-shadow: 0 0 20px rgba(255, 213, 79, 0.9);
+    }
+
+    .window-frame {
+      position: absolute;
+      background: #4e342e;
+      border-radius: 4px;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+    }
+
+    /* Улучшенные компактные фонари */
+    .street-lamp {
+      position: fixed;
+      bottom: 140px;
+      z-index: 3;
+    }
+
+    .lamp-pole {
+      width: 5px;
+      height: 70px;
+      background: linear-gradient(to top, #263238, #37474f, #455a64);
+      margin: 0 auto;
+      position: relative;
+      border-radius: 2px 2px 0 0;
+    }
+
+    .lamp-arm {
+      width: 40px;
+      height: 6px;
+      background: linear-gradient(90deg, #37474f, #546e7a, #37474f);
+      position: absolute;
+      top: -10px;
+      left: -17px;
+      border-radius: 3px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+
+    .lamp-arm::before {
+      content: '';
+      position: absolute;
+      top: 1px;
+      left: 1px;
+      right: 1px;
+      bottom: 1px;
+      background: linear-gradient(90deg, #455a64, #607d8b, #455a64);
+      border-radius: 2px;
+    }
+
+    .lamp-light {
+      width: 25px;
+      height: 25px;
+      background: radial-gradient(circle at 30% 30%, #fffde7, #ffeb3b, #ffd54f);
+      border-radius: 50%;
+      position: absolute;
+      top: -30px;
+      left: -10px;
+      box-shadow: 
+        0 0 30px 10px rgba(255, 235, 59, 0.6),
+        0 0 60px 20px rgba(255, 213, 79, 0.3);
+      animation: lamp-flicker 4s ease-in-out infinite;
+      filter: blur(1px);
+    }
+
+    .lamp-light::before {
+      content: '';
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      width: 8px;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      filter: blur(1.5px);
+    }
+
+    @keyframes lamp-flicker {
+      0%, 100% { opacity: 0.9; transform: scale(1); }
+      25% { opacity: 0.95; transform: scale(1.02); }
+      50% { opacity: 1; transform: scale(1.05); }
+      75% { opacity: 0.92; transform: scale(0.98); }
+    }
+
+    /* Дорога с двумя полосами */
+    .road-container {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 140px;
+      background: #2c3e50;
+      z-index: 2;
+      overflow: hidden;
+    }
+
+    .road {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .road-lane {
+      position: absolute;
+      width: 50%;
+      height: 50%;
+    }
+
+    .road-lane.bottom {
+      bottom: 0;
+      border-top: 3px dashed #ffd54f;
+    }
+
+    .road-lane.top {
+      top: 0;
+      border-bottom: 3px dashed #ffd54f;
+    }
+
+    .road-lane.left {
+      left: 0;
+    }
+
+    .road-lane.right {
+      right: 0;
+    }
+
+    .road-markings {
+      position: absolute;
+      width: 100%;
+      height: 4px;
+      background: repeating-linear-gradient(
+        90deg,
+        #ffd54f,
+        #ffd54f 25px,
+        transparent 25px,
+        transparent 50px
+      );
+    }
+
+    .road-lane.bottom .road-markings {
+      top: 60%;
+    }
+
+    .road-lane.top .road-markings {
+      bottom: 60%;
+    }
+
+    .road-shoulder {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 20px;
+      background: #34495e;
+      box-shadow: inset 0 5px 10px rgba(0,0,0,0.3);
+    }
+
+    .road-shoulder::before {
+      content: '';
+      position: absolute;
+      top: 6px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: repeating-linear-gradient(
+        90deg,
+        #78909c,
+        #78909c 10px,
+        transparent 10px,
+        transparent 20px
+      );
+    }
+
+    .road-shoulder.bottom {
+      top: auto;
+      bottom: 0;
+    }
+
+    /* Грузовики с правильным расположением по полосам */
+    .truck {
+      position: fixed;
+      font-size: 3.5rem;
+      z-index: 3;
+      filter: drop-shadow(3px 5px 10px rgba(0,0,0,0.7));
+      text-shadow: 0 0 25px currentColor;
+    }
+
+    /* Грузовики слева направо - НИЖНЯЯ полоса */
+    .truck-right-1 {
+      bottom: 23px;
+      left: -200px;
+      color: #e74c3c;
+      animation: truck-drive-right 12s linear infinite;
+    }
+
+    .truck-right-2 {
+      bottom: 23px;
+      left: -400px;
+      color: #3498db;
+      animation: truck-drive-right 15s linear infinite;
+      animation-delay: 4s;
+    }
+
+    .truck-right-3 {
+      bottom: 23px;
+      left: -300px;
+      color: #2ecc71;
+      animation: truck-drive-right 8s linear infinite;
+      animation-delay: 8s;
+    }
+
+    /* Грузовики справа налево - ВЕРХНЯЯ полоса */
+    .truck-left-1 {
+      bottom: 85px;
+      right: -200px;
+      color: #9b59b6;
+      animation: truck-drive-left 14s linear infinite;
+      transform: scaleX(-1);
+    }
+
+    .truck-left-2 {
+      bottom: 85px;
+      right: -350px;
+      color: #f39c12;
+      animation: truck-drive-left 16s linear infinite;
+      animation-delay: 3s;
+      transform: scaleX(-1);
+    }
+
+    .truck-left-3 {
+      bottom: 85px;
+      right: -250px;
+      color: #1abc9c;
+      animation: truck-drive-left 13s linear infinite;
+      animation-delay: 6s;
+      transform: scaleX(-1);
+    }
+
+    @keyframes truck-drive-right {
+      0% { transform: translateX(0) rotateY(0deg); }
+      100% { transform: translateX(calc(100vw + 400px)) rotateY(0deg); }
+    }
+
+    @keyframes truck-drive-left {
+      0% { transform: translateX(0) scaleX(-1); }
+      100% { transform: translateX(calc(-100vw - 400px)) scaleX(-1); }
+    }
+
+    /* Контейнер формы */
     .container {
-      background: white;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-      max-width: 900px;
-      margin: auto;
+      position: relative;
+      width: 100%;
+      max-width: 1200px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(25px);
+      border-radius: 20px;
+      box-shadow: 
+        0 25px 50px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      overflow: hidden;
+      animation: fadeIn 1s ease-out;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 10;
+      margin: 0 auto;
+      padding: 2.5rem;
     }
-    h1 {
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .logo {
       text-align: center;
-      margin-bottom: 1.5rem;
-      color: #333;
+      margin: 20px 0 40px;
+      position: relative;
     }
+
+    .logo i {
+      font-size: 4rem;
+      color: #f39c12;
+      margin-bottom: 20px;
+      display: block;
+      text-shadow: 0 0 30px rgba(243, 156, 18, 0.7);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    .logo h1 {
+      color: white;
+      font-size: 2.5rem;
+      font-weight: 700;
+      text-shadow: 0 2px 15px rgba(0, 0, 0, 0.4);
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, #f39c12, #ffd54f, #f39c12);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% auto;
+      animation: shimmer 3s infinite linear;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 0% center; }
+      100% { background-position: 200% center; }
+    }
+
+    .logo p {
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 1.1rem;
+      margin-top: 5px;
+      font-weight: 300;
+    }
+
     .form-group {
       display: flex;
       gap: 1rem;
       flex-wrap: wrap;
-      margin-bottom: 1.5rem;
+      margin-bottom: 2rem;
     }
+
     .form-group input {
       flex: 1;
       min-width: 150px;
-      padding: 0.75rem;
-      border: 2px solid #ddd;
-      border-radius: 5px;
+      padding: 0.9rem;
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
       font-size: 1rem;
+      transition: all 0.3s;
+      background-color: rgba(255, 255, 255, 0.08);
+      color: white;
+      backdrop-filter: blur(10px);
     }
+
+    .form-group input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
     .form-group input:focus {
       outline: none;
-      border-color: #667eea;
-    }
-    .form-group button {
-      padding: 0.75rem 1.5rem;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    .form-group button:hover {
+      border-color: #f39c12;
+      background-color: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.25);
       transform: translateY(-2px);
     }
+
+    .form-group button {
+      padding: 0.9rem 1.8rem;
+      background: linear-gradient(135deg, #f39c12, #e67e22);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 6px 20px rgba(230, 126, 34, 0.4);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .form-group button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(230, 126, 34, 0.5);
+      background: linear-gradient(135deg, #f1c40f, #f39c12);
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 1rem;
+      margin-top: 1.5rem;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     }
+
     th, td {
-      border: 1px solid #ccc;
-      padding: 0.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 1rem;
       text-align: center;
-    }
-    th {
-      background-color: #f2f2f2;
-    }
-    .action-btn {
-      padding: 0.4rem 0.8rem;
-      margin: 0 2px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
       color: white;
     }
-    .delete-btn { background-color: #e74c3c; }
-    .edit-btn { background-color: #3498db; }
+
+    th {
+      background-color: rgba(243, 156, 18, 0.25);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+    }
+
+    tr {
+      transition: all 0.3s;
+    }
+
+    tr:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .action-btn {
+      padding: 0.5rem 1rem;
+      margin: 0 3px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: white;
+      font-weight: 500;
+      transition: all 0.3s;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      font-size: 0.85rem;
+    }
+
+    .delete-btn { 
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+    }
+    
+    .delete-btn:hover {
+      background: linear-gradient(135deg, #c0392b, #a93226);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(192, 57, 43, 0.4);
+    }
+    
+    .edit-btn { 
+      background: linear-gradient(135deg, #3498db, #2980b9);
+    }
+    
+    .edit-btn:hover {
+      background: linear-gradient(135deg, #2980b9, #2471a3);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(41, 128, 185, 0.4);
+    }
+    
+    .availability-btn {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+    }
+    
+    .availability-btn:hover {
+      background: linear-gradient(135deg, #27ae60, #219653);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(39, 174, 96, 0.4);
+    }
+
     .message {
       text-align: center;
       margin-top: 1rem;
       font-weight: bold;
-      color: #e74c3c;
+      color: #ffb8b8;
       display: none;
+      padding: 12px;
+      border-radius: 8px;
+      background-color: rgba(231, 76, 60, 0.25);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      animation: shake 0.5s;
     }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+      20%, 40%, 60%, 80% { transform: translateX(4px); }
+    }
+
     .modal {
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0,0,0,0.8);
       display: none;
       justify-content: center;
       align-items: center;
+      z-index: 100;
     }
+
     .modal-content {
-      background: white;
-      padding: 2rem;
-      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(25px);
+      padding: 2.5rem;
+      border-radius: 20px;
       width: 100%;
-      max-width: 400px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      max-width: 450px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      animation: fadeIn 0.5s ease-out;
     }
+
     .modal-content h2 {
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
       text-align: center;
+      color: white;
+      font-size: 1.8rem;
+      background: linear-gradient(90deg, #f39c12, #ffd54f);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
+
+    .modal-content label {
+      display: block;
+      margin-bottom: 8px;
+      color: rgba(255, 255, 255, 0.95);
+      font-weight: 500;
+    }
+
     .modal-content input {
       width: 100%;
-      margin-bottom: 1rem;
-      padding: 0.75rem;
-      border: 2px solid #ddd;
-      border-radius: 5px;
+      margin-bottom: 1.2rem;
+      padding: 0.9rem;
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      background-color: rgba(255, 255, 255, 0.08);
+      color: white;
+      backdrop-filter: blur(10px);
     }
+
+    .modal-content input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .modal-content input:focus {
+      outline: none;
+      border-color: #f39c12;
+      background-color: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.25);
+    }
+
     .modal-content button {
       width: 100%;
-      padding: 0.75rem;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 0.9rem;
+      background: linear-gradient(135deg, #f39c12, #e67e22);
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 12px;
       font-size: 1rem;
       cursor: pointer;
+      margin-bottom: 10px;
+      font-weight: 600;
+      box-shadow: 0 6px 20px rgba(230, 126, 34, 0.4);
+      transition: all 0.3s;
+    }
+
+    .modal-content button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(230, 126, 34, 0.5);
+      background: linear-gradient(135deg, #f1c40f, #f39c12);
+    }
+
+    .modal-content .cancel-btn {
+      background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+    }
+
+    .modal-content .cancel-btn:hover {
+      background: linear-gradient(135deg, #7f8c8d, #6c7a7d);
+      box-shadow: 0 6px 15px rgba(127, 140, 141, 0.4);
+    }
+
+    /* Звезды на небе */
+    .stars {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle 4s infinite;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+
+    /* Луна */
+    .moon {
+      position: fixed;
+      top: 50px;
+      right: 80px;
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle at 30% 30%, #fff, #f5f5f5, #e0e0e0);
+      border-radius: 50%;
+      box-shadow: 
+        0 0 60px rgba(255, 255, 255, 0.8),
+        0 0 100px rgba(255, 255, 255, 0.4);
+      z-index: -1;
+      animation: moon-glow 8s infinite alternate;
+    }
+
+    .moon::before {
+      content: '';
+      position: absolute;
+      top: 15px;
+      left: 20px;
+      width: 20px;
+      height: 20px;
+      background: rgba(200, 200, 200, 0.4);
+      border-radius: 50%;
+      box-shadow: 
+        15px 10px 0 -3px rgba(200, 200, 200, 0.3),
+        30px 30px 0 -5px rgba(200, 200, 200, 0.2);
+    }
+
+    @keyframes moon-glow {
+      0% { box-shadow: 0 0 60px rgba(255, 255, 255, 0.8), 0 0 100px rgba(255, 255, 255, 0.4); }
+      100% { box-shadow: 0 0 80px rgba(255, 255, 255, 0.9), 0 0 120px rgba(255, 255, 255, 0.5); }
+    }
+
+    /* Облака */
+    .cloud {
+      position: fixed;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50px;
+      z-index: -1;
+      animation: cloud-drift 120s linear infinite;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+    }
+
+    .cloud::before, .cloud::after {
+      content: '';
+      position: absolute;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+    }
+
+    @keyframes cloud-drift {
+      0% { transform: translateX(-200px); }
+      100% { transform: translateX(calc(100vw + 200px)); }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 1.5rem;
+        max-width: 95%;
+      }
+      
+      .form-group {
+        flex-direction: column;
+      }
+      
+      .form-group input {
+        min-width: 100%;
+      }
+      
+      table {
+        font-size: 0.9rem;
+      }
+      
+      .action-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+      }
+      
+      .truck {
+        font-size: 2.8rem;
+      }
+      
+      .city-background {
+        padding: 0 10px;
+      }
+      
+      .truck-right-1, .truck-right-2, .truck-right-3 {
+        bottom: 25px;
+      }
+      
+      .truck-left-1, .truck-left-2, .truck-left-3 {
+        bottom: 75px;
+      }
+      
+      .street-lamp {
+        bottom: 140px;
+      }
+      
+      .moon {
+        width: 50px;
+        height: 50px;
+        top: 30px;
+        right: 30px;
+      }
     }
   </style>
 </head>
 <body>
+  <!-- Звездное небо -->
+  <div class="stars" id="stars"></div>
+  
+  <!-- Луна -->
+  <div class="moon"></div>
+  
+  <!-- Облака -->
+  <div class="cloud" style="top: 15%; width: 120px; height: 40px; animation-delay: 0s;"></div>
+  <div class="cloud" style="top: 25%; width: 150px; height: 50px; animation-delay: -30s;"></div>
+  <div class="cloud" style="top: 10%; width: 100px; height: 35px; animation-delay: -60s;"></div>
+  
+  <!-- Городской фон с множеством зданий -->
+  <div class="city-background" id="city-background">
+    <!-- Здания будут созданы через JavaScript -->
+  </div>
+  
+  <!-- Улучшенные компактные фонари -->
+  <div class="street-lamp" style="left: 12%;">
+    <div class="lamp-pole">
+      <div class="lamp-arm"></div>
+      <div class="lamp-light"></div>
+    </div>
+  </div>
+  <div class="street-lamp" style="left: 37%;">
+    <div class="lamp-pole">
+      <div class="lamp-arm"></div>
+      <div class="lamp-light"></div>
+    </div>
+  </div>
+  <div class="street-lamp" style="left: 62%;">
+    <div class="lamp-pole">
+      <div class="lamp-arm"></div>
+      <div class="lamp-light"></div>
+    </div>
+  </div>
+  <div class="street-lamp" style="left: 87%;">
+    <div class="lamp-pole">
+      <div class="lamp-arm"></div>
+      <div class="lamp-light"></div>
+    </div>
+  </div>
+  
+  <!-- Грузовики слева направо - НИЖНЯЯ полоса -->
+  <div class="truck truck-right-1">
+    <i class="fas fa-truck-moving"></i>
+  </div>
+  
+  <div class="truck truck-right-2">
+    <i class="fas fa-truck"></i>
+  </div>
+  
+  <div class="truck truck-right-3">
+    <i class="fas fa-shipping-fast"></i>
+  </div>
+  
+  <!-- Грузовики справа налево - ВЕРХНЯЯ полоса -->
+  <div class="truck truck-left-1">
+    <i class="fas fa-truck-moving"></i>
+  </div>
+  
+  <div class="truck truck-left-2">
+    <i class="fas fa-truck"></i>
+  </div>
+  
+  <div class="truck truck-left-3">
+    <i class="fas fa-shipping-fast"></i>
+  </div>
+  
+  <!-- Дорога с двумя полосами -->
+  <div class="road-container">
+    <div class="road">
+      <!-- Нижняя полоса (слева направо) -->
+      <div class="road-lane bottom left">
+        <div class="road-markings"></div>
+      </div>
+      <div class="road-lane bottom right">
+        <div class="road-markings"></div>
+      </div>
+      
+      <!-- Верхняя полоса (справа налево) -->
+      <div class="road-lane top left">
+        <div class="road-markings"></div>
+      </div>
+      <div class="road-lane top right">
+        <div class="road-markings"></div>
+      </div>
+      
+      <div class="road-shoulder"></div>
+      <div class="road-shoulder bottom"></div>
+    </div>
+  </div>
+
   <div class="container">
-    <h1>Управление грузовиками</h1>
+    <div class="logo">
+      <i class="fas fa-truck-loading"></i>
+      <h1>Управление грузовиками</h1>
+      <p>CargoDrip - Умная логистика грузоперевозок</p>
+    </div>
+    
     <div class="form-group">
       <input type="text" id="plate" placeholder="Номер ТС" />
       <input type="text" id="model" placeholder="Модель" />
@@ -136,7 +890,9 @@
       <input type="number" id="volume" placeholder="Объём (м³)" min="0" />
       <button onclick="addTruck()">Добавить</button>
     </div>
+    
     <div class="message" id="error-message"></div>
+    
     <table>
       <thead>
         <tr>
@@ -165,176 +921,329 @@
       <label for="edit-volume">Объём (м³)</label>
       <input type="number" id="edit-volume" min="0" />
       <button onclick="submitEdit()">Сохранить</button>
+      <button class="cancel-btn" onclick="document.getElementById('edit-modal').style.display = 'none'">Отмена</button>
     </div>
   </div>
 
   <div class="modal" id="delete-modal">
     <div class="modal-content">
       <h2>Подтвердите удаление</h2>
-      <p id="delete-message"></p>
-      <button onclick="confirmDelete()" style="background-color:#e74c3c; margin-bottom: 10px;">Удалить</button>
-      <button onclick="cancelDelete()">Отмена</button>
+      <p id="delete-message" style="color: white; margin-bottom: 1.5rem;"></p>
+      <button onclick="confirmDelete()" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">Удалить</button>
+      <button class="cancel-btn" onclick="cancelDelete()">Отмена</button>
     </div>
   </div>
 
- <script>
-  const API_BASE = "http://localhost:8000";
-  let currentEditId = null;
-  let currentDeleteId = null;
-
-  async function loadTrucks() {
-    const response = await fetch(`${API_BASE}/trucks`);
-    const data = await response.json();
-    const trucks = data.items || [];
-    const table = document.getElementById("truck-table");
-    table.innerHTML = "";
-
-    trucks.forEach(truck => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${truck.id}</td>
-        <td>${truck.plate_number}</td>
-        <td>${truck.model}</td>
-        <td>${truck.capacity_kg}</td>
-        <td>${truck.volume_m3}</td>
-        <td>${truck.available ? "Да" : "Нет"}</td>
-        <td>
-          <button class="action-btn delete-btn" onclick="openDeleteModal(${truck.id}, '${truck.plate_number}')">Удалить</button>
-          <button class="action-btn edit-btn" onclick="openEditModal(${truck.id}, '${truck.plate_number}', '${truck.model}', ${truck.capacity_kg}, ${truck.volume_m3})">Изменить</button>
-          <button class="action-btn" style="background-color:${truck.available ? '#f39c12' : '#2ecc71'}"
-            onclick="toggleAvailability(${truck.id}, ${truck.available})">
-            ${truck.available ? "Сделать недоступным" : "Сделать доступным"}
-          </button>
-        </td>
-      `;
-      table.appendChild(row);
-    });
-  }
-
-  async function addTruck() {
-    const plate = document.getElementById("plate").value.trim();
-    const model = document.getElementById("model").value.trim();
-    const capacity = parseInt(document.getElementById("capacity").value);
-    const volume = parseInt(document.getElementById("volume").value);
-    const errorBox = document.getElementById("error-message");
-
-    if (!plate || !model || isNaN(capacity) || isNaN(volume) || capacity < 0 || volume < 0) {
-      errorBox.textContent = "Пожалуйста, заполните все поля корректно.";
-      errorBox.style.display = "block";
-      return;
+  <script>
+    // Создание звездного неба
+    function createStars() {
+      const container = document.getElementById('stars');
+      
+      for (let i = 0; i < 450; i++) {
+        const star = document.createElement('div');
+        star.classList.add('star');
+        
+        const size = Math.random() * 2 + 1;
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.top = `${Math.random() * 70}%`;
+        star.style.animationDelay = `${Math.random() * 4}s`;
+        star.style.opacity = Math.random() * 0.7 + 0.3;
+        
+        container.appendChild(star);
+      }
     }
 
-    errorBox.style.display = "none";
+    // Создание улучшенных зданий без громоотводов
+    function createCity() {
+      const container = document.getElementById('city-background');
+      const buildingCount = 8;
+      const buildingWidths = [80, 100, 120, 90, 110, 95, 85, 105];
+      const buildingHeights = [250, 300, 200, 350, 280, 320, 270, 290];
+      
+      for (let i = 0; i < buildingCount; i++) {
+        const building = document.createElement('div');
+        building.classList.add('building');
+        
+        const width = buildingWidths[i];
+        const height = buildingHeights[i];
+        
+        building.style.width = `${width}px`;
+        building.style.height = `${height}px`;
+        building.style.flex = `0 0 ${width}px`;
+        
+        // Добавляем улучшенную крышу
+        const roof = document.createElement('div');
+        roof.classList.add('building-roof');
+        building.appendChild(roof);
+        
+        // Равномерное распределение окон по всему зданию
+        const windowRows = Math.floor((height - 80) / 35);
+        const windowCols = Math.floor((width - 20) / 25);
+        
+        const startY = 40;
+        const startX = 10;
+        
+        for (let row = 0; row < windowRows; row++) {
+          for (let col = 0; col < windowCols; col++) {
+            // Создаем рамку окна
+            const windowFrame = document.createElement('div');
+            windowFrame.classList.add('window-frame');
+            
+            const frameWidth = 20;
+            const frameHeight = 28;
+            const frameLeft = startX + col * 25;
+            const frameTop = startY + row * 35;
+            
+            windowFrame.style.width = `${frameWidth}px`;
+            windowFrame.style.height = `${frameHeight}px`;
+            windowFrame.style.left = `${frameLeft}px`;
+            windowFrame.style.top = `${frameTop}px`;
+            building.appendChild(windowFrame);
+            
+            // Создаем само окно
+            const window = document.createElement('div');
+            window.classList.add('window');
+            
+            const windowWidth = 14;
+            const windowHeight = 20;
+            const windowLeft = startX + col * 25 + 3;
+            const windowTop = startY + row * 35 + 4;
+            
+            window.style.width = `${windowWidth}px`;
+            window.style.height = `${windowHeight}px`;
+            window.style.left = `${windowLeft}px`;
+            window.style.top = `${windowTop}px`;
+            
+            // Случайное включение/выключение окон
+            if (Math.random() > 0.3) {
+              window.style.background = 'linear-gradient(135deg, #ffeb3b, #fbc02d)';
+              window.style.animation = `twinkle ${Math.random() * 8 + 4}s infinite`;
+            } else {
+              window.style.background = '#37474f';
+              window.style.boxShadow = 'inset 0 2px 5px rgba(0,0,0,0.5)';
+            }
+            
+            building.appendChild(window);
+          }
+        }
+        
+        container.appendChild(building);
+      }
+    }
 
-    const truck = {
-      plate_number: plate,
-      model: model,
-      capacity_kg: capacity,
-      volume_m3: volume,
-      available: true
-    };
+    // Создание облаков
+    function createClouds() {
+      const body = document.querySelector('body');
+      for (let i = 0; i < 5; i++) {
+        const cloud = document.createElement('div');
+        cloud.classList.add('cloud');
+        
+        const width = Math.random() * 100 + 80;
+        const height = width * 0.3;
+        const top = Math.random() * 30 + 5;
+        const delay = Math.random() * 100;
+        
+        cloud.style.width = `${width}px`;
+        cloud.style.height = `${height}px`;
+        cloud.style.top = `${top}%`;
+        cloud.style.animationDelay = `-${delay}s`;
+        
+        // Создание формы облака
+        cloud.style.borderRadius = `${height}px`;
+        
+        cloud.innerHTML = `
+          <style>
+            .cloud:nth-child(${i+1})::before {
+              content: '';
+              position: absolute;
+              top: -${height/2}px;
+              left: ${width/4}px;
+              width: ${width/2}px;
+              height: ${width/2}px;
+              background: rgba(255, 255, 255, 0.1);
+              border-radius: 50%;
+            }
+            .cloud:nth-child(${i+1})::after {
+              content: '';
+              position: absolute;
+              top: -${height/3}px;
+              right: ${width/4}px;
+              width: ${width/3}px;
+              height: ${width/3}px;
+              background: rgba(255, 255, 255, 0.1);
+              border-radius: 50%;
+            }
+          </style>
+        `;
+        
+        body.appendChild(cloud);
+      }
+    }
 
-    const response = await fetch(`${API_BASE}/trucks`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(truck)
-    });
-
-    if (response.ok) {
-      document.getElementById("plate").value = "";
-      document.getElementById("model").value = "";
-      document.getElementById("capacity").value = "";
-      document.getElementById("volume").value = "";
+    // Инициализация после загрузки DOM
+    document.addEventListener('DOMContentLoaded', () => {
+      createStars();
+      createCity();
+      createClouds();
       loadTrucks();
-    } else {
-      errorBox.textContent = "Ошибка при добавлении. Проверьте данные.";
-      errorBox.style.display = "block";
-    }
-  }
-
-  function openEditModal(id, plate, model, capacity, volume) {
-    currentEditId = id;
-    document.getElementById("edit-plate").value = plate;
-    document.getElementById("edit-model").value = model;
-    document.getElementById("edit-capacity").value = capacity;
-    document.getElementById("edit-volume").value = volume;
-    document.getElementById("edit-modal").style.display = "flex";
-  }
-
-  async function submitEdit() {
-    const plate = document.getElementById("edit-plate").value.trim();
-    const model = document.getElementById("edit-model").value.trim();
-    const capacity = parseInt(document.getElementById("edit-capacity").value);
-    const volume = parseInt(document.getElementById("edit-volume").value);
-
-    if (!plate || !model || isNaN(capacity) || isNaN(volume) || capacity < 0 || volume < 0) {
-      alert("Пожалуйста, заполните все поля корректно.");
-      return;
-    }
-
-    const updatedTruck = {
-      plate_number: plate,
-      model: model,
-      capacity_kg: capacity,
-      volume_m3: volume,
-      available: true
-    };
-
-    const response = await fetch(`${API_BASE}/trucks/${currentEditId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedTruck)
     });
 
-    if (response.ok) {
-      document.getElementById("edit-modal").style.display = "none";
-      loadTrucks();
-    } else {
-      alert("Ошибка при обновлении. Проверьте данные.");
+    // Оригинальная логика формы (не изменена)
+    const API_BASE = "http://localhost:8000";
+    let currentEditId = null;
+    let currentDeleteId = null;
+
+    async function loadTrucks() {
+      const response = await fetch(`${API_BASE}/trucks`);
+      const data = await response.json();
+      const trucks = data.items || [];
+      const table = document.getElementById("truck-table");
+      table.innerHTML = "";
+
+      trucks.forEach(truck => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${truck.id}</td>
+          <td>${truck.plate_number}</td>
+          <td>${truck.model}</td>
+          <td>${truck.capacity_kg}</td>
+          <td>${truck.volume_m3}</td>
+          <td>${truck.available ? "Да" : "Нет"}</td>
+          <td>
+            <button class="action-btn delete-btn" onclick="openDeleteModal(${truck.id}, '${truck.plate_number}')">Удалить</button>
+            <button class="action-btn edit-btn" onclick="openEditModal(${truck.id}, '${truck.plate_number}', '${truck.model}', ${truck.capacity_kg}, ${truck.volume_m3})">Изменить</button>
+            <button class="action-btn availability-btn" onclick="toggleAvailability(${truck.id}, ${truck.available})">
+              ${truck.available ? "Сделать недоступным" : "Сделать доступным"}
+            </button>
+          </td>
+        `;
+        table.appendChild(row);
+      });
     }
-  }
 
-  function openDeleteModal(id, plate) {
-    currentDeleteId = id;
-    document.getElementById("delete-message").textContent = `Вы точно хотите удалить ТС с номером "${plate}"?`;
-    document.getElementById("delete-modal").style.display = "flex";
-  }
+    async function addTruck() {
+      const plate = document.getElementById("plate").value.trim();
+      const model = document.getElementById("model").value.trim();
+      const capacity = parseInt(document.getElementById("capacity").value);
+      const volume = parseInt(document.getElementById("volume").value);
+      const errorBox = document.getElementById("error-message");
 
-  function cancelDelete() {
-    currentDeleteId = null;
-    document.getElementById("delete-modal").style.display = "none";
-  }
+      if (!plate || !model || isNaN(capacity) || isNaN(volume) || capacity < 0 || volume < 0) {
+        errorBox.textContent = "Пожалуйста, заполните все поля корректно.";
+        errorBox.style.display = "block";
+        return;
+      }
 
-  async function confirmDelete() {
-    await fetch(`${API_BASE}/trucks?truck_id=${currentDeleteId}`, {
-      method: "DELETE"
-    });
-    document.getElementById("delete-modal").style.display = "none";
-    loadTrucks();
-  }
+      errorBox.style.display = "none";
 
-  async function toggleAvailability(id, currentStatus) {
-    const response = await fetch(`${API_BASE}/trucks/${id}/availability?available=${!currentStatus}`, {
-      method: "PATCH"
-    });
-    if (response.ok) {
-      loadTrucks();
-    } else {
-      alert("Ошибка при смене доступности.");
+      const truck = {
+        plate_number: plate,
+        model: model,
+        capacity_kg: capacity,
+        volume_m3: volume,
+        available: true
+      };
+
+      const response = await fetch(`${API_BASE}/trucks`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(truck)
+      });
+
+      if (response.ok) {
+        document.getElementById("plate").value = "";
+        document.getElementById("model").value = "";
+        document.getElementById("capacity").value = "";
+        document.getElementById("volume").value = "";
+        loadTrucks();
+      } else {
+        errorBox.textContent = "Ошибка при добавлении. Проверьте данные.";
+        errorBox.style.display = "block";
+      }
     }
-  }
 
-  window.addEventListener("click", function (event) {
-    if (event.target === document.getElementById("edit-modal")) {
-      document.getElementById("edit-modal").style.display = "none";
+    function openEditModal(id, plate, model, capacity, volume) {
+      currentEditId = id;
+      document.getElementById("edit-plate").value = plate;
+      document.getElementById("edit-model").value = model;
+      document.getElementById("edit-capacity").value = capacity;
+      document.getElementById("edit-volume").value = volume;
+      document.getElementById("edit-modal").style.display = "flex";
     }
-    if (event.target === document.getElementById("delete-modal")) {
+
+    async function submitEdit() {
+      const plate = document.getElementById("edit-plate").value.trim();
+      const model = document.getElementById("edit-model").value.trim();
+      const capacity = parseInt(document.getElementById("edit-capacity").value);
+      const volume = parseInt(document.getElementById("edit-volume").value);
+
+      if (!plate || !model || isNaN(capacity) || isNaN(volume) || capacity < 0 || volume < 0) {
+        alert("Пожалуйста, заполните все поля корректно.");
+        return;
+      }
+
+      const updatedTruck = {
+        plate_number: plate,
+        model: model,
+        capacity_kg: capacity,
+        volume_m3: volume,
+        available: true
+      };
+
+      const response = await fetch(`${API_BASE}/trucks/${currentEditId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedTruck)
+      });
+
+      if (response.ok) {
+        document.getElementById("edit-modal").style.display = "none";
+        loadTrucks();
+      } else {
+        alert("Ошибка при обновлении. Проверьте данные.");
+      }
+    }
+
+    function openDeleteModal(id, plate) {
+      currentDeleteId = id;
+      document.getElementById("delete-message").textContent = `Вы точно хотите удалить ТС с номером "${plate}"?`;
+      document.getElementById("delete-modal").style.display = "flex";
+    }
+
+    function cancelDelete() {
+      currentDeleteId = null;
       document.getElementById("delete-modal").style.display = "none";
     }
-  });
 
-  window.onload = loadTrucks;
-</script>
+    async function confirmDelete() {
+      await fetch(`${API_BASE}/trucks?truck_id=${currentDeleteId}`, {
+        method: "DELETE"
+      });
+      document.getElementById("delete-modal").style.display = "none";
+      loadTrucks();
+    }
 
+    async function toggleAvailability(id, currentStatus) {
+      const response = await fetch(`${API_BASE}/trucks/${id}/availability?available=${!currentStatus}`, {
+        method: "PATCH"
+      });
+      if (response.ok) {
+        loadTrucks();
+      } else {
+        alert("Ошибка при смене доступности.");
+      }
+    }
+
+    window.addEventListener("click", function (event) {
+      if (event.target === document.getElementById("edit-modal")) {
+        document.getElementById("edit-modal").style.display = "none";
+      }
+      if (event.target === document.getElementById("delete-modal")) {
+        document.getElementById("delete-modal").style.display = "none";
+      }
+    });
+  </script>
 </body>
 </html>
