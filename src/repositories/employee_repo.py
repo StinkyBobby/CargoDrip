@@ -1,7 +1,6 @@
 from src.repositories.sqlalchemy_repo import SQLalchemy
 from src.models.employee import EmployeeORM
 import bcrypt
-
 from src.scheme.employee_scheme import EmployeeCreate
 
 class EmployeeRepo(SQLalchemy):

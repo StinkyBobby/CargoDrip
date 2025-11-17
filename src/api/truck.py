@@ -40,9 +40,6 @@ async def get_trucks(
     trucks = await truck_service.get_more()
     return trucks
 
-
-
-
 @truck_router.get("/{truck_id}")
 async def get_truck(
     truck_id: int, 
@@ -52,7 +49,7 @@ async def get_truck(
     return truck
 
 
-@truck_router.delete("")
+@truck_router.delete("/{truck_id}")
 async def delete_truck(
     truck_id: int,
     truck_service: TruckService = Depends(get_truck_service)

@@ -1,9 +1,7 @@
 from datetime import datetime
 from typing import Optional
-
 from sqlalchemy import ForeignKey, text
 from sqlalchemy.orm import Mapped, mapped_column
-
 from src.models.base import Base
 from src.models.types import DeliveryStatus
 

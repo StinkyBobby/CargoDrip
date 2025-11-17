@@ -1,11 +1,9 @@
 from sqlalchemy.orm import DeclarativeBase
 
 class Base(DeclarativeBase):
-    __abstract__ = True # не будет отображаться как таблица в базе данных
-    # настройки для __repr__
+    __abstract__ = True
     repr_cols_num = 10 
-    repr_cols = tuple() # кортеж с именами колонок
-    # вывод в таблицу по примеру: <User id=1, name=Name, email=email@gmail.com>
+    repr_cols = tuple() 
     def __repr__(self):
         cols = []
         for attr in self.__mapper__.column_attrs:

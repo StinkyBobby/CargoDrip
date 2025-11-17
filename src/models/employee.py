@@ -1,8 +1,6 @@
 from datetime import datetime
-
-from sqlalchemy import ForeignKey, Integer, func, text
+from sqlalchemy import Integer, text
 from sqlalchemy.orm import Mapped, mapped_column
-
 from src.models.base import Base
 from src.models.types import role_enum_new
 

@@ -3,7 +3,6 @@ from pydantic import BaseModel, Field, field_validator
 from src.models.types import DeliveryStatus
 from datetime import datetime
 
-
 class ShipmentsCreate(BaseModel):
     cargo_id: int
     truck_id: int
@@ -19,13 +18,11 @@ class ShipmentsCreate(BaseModel):
             return v.replace(tzinfo=None)
         return v
 
-
 class ShipmentsDTO(ShipmentsCreate):
     id: int
     
     class Config:
         from_attributes = True
-
 
 class MoreShipmentsDTO(BaseModel):
     items: List[ShipmentsDTO]

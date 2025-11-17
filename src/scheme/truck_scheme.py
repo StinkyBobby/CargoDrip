@@ -1,5 +1,4 @@
 from pydantic import BaseModel, Field
-
 from typing import List
 
 class TruckCreate(BaseModel):
@@ -8,7 +7,6 @@ class TruckCreate(BaseModel):
     capacity_kg: int
     volume_m3: int 
     available: bool
-
 
 class TruckDTO(TruckCreate):
     id: int

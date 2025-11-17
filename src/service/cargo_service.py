@@ -1,5 +1,4 @@
-from typing import Callable, List
-
+from typing import List
 from fastapi import HTTPException
 from starlette import status
 from src.repositories.base_repo import AbstractRepo
@@ -55,4 +54,4 @@ class CargoService():
                 status_code=status.HTTP_404_NOT_FOUND, detail="Cargo is not found"
             )
             
-        return CargoDTO.model_validate(cargo)
+        return CargoDTO.model_validate(cargo) 

@@ -70,9 +70,5 @@ async def update_status(
     status: str,
     shipments_service: ShipmentsService = Depends(get_shipments_service),
 ) -> ShipmentsDTO:
-    """
-    Обновление статуса доставки (например: pending, in_transit, delivered).
-    """
-    # Можно сделать отдельный метод в сервисе, но пока используем update_shipment
     updated = await shipments_service.shipments_repo.update({"status": status}, id=shipment_id)
     return ShipmentsDTO.model_validate(updated)

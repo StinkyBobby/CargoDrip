@@ -1,8 +1,6 @@
-from typing import List, TypeVar, Generic, Union, Optional
-
-from sqlalchemy import update, delete, select, func
-
-
+from pydoc import text
+from typing import List
+from sqlalchemy import update, delete, select
 from src.config.db_data import db
 from src.repositories import AbstractRepo
 
@@ -10,7 +8,6 @@ from src.repositories import AbstractRepo
 class SQLalchemy(AbstractRepo):
     model = None
     options = None
-
 
     async def create(self, data: dict):
         async with db.get_session() as session:
@@ -64,15 +61,24 @@ class SQLalchemy(AbstractRepo):
 
             result = await session.execute(query)
             return result.scalar_one_or_none()
-        
-    async def find_all(self, limit: int = 100, offset: int = 0, order_by: str = None, **filters):
+
+    async def find_all(
+        self,
+        limit: int = 100,
+        offset: int = 0,
+        order_by: str | None = None,
+        **filters
+    ):
         async with db.get_session() as session:
             query = (
                 select(self.model)
                 .limit(limit)
                 .offset(offset)
-                .order_by(order_by)
                 .filter_by(**filters)
             )
+
+            if order_by:
+                query = query.order_by(text(order_by))
+
             result = await session.execute(query)
-            return result.unique().scalars().all() 
+            return result.unique().scalars().all()
