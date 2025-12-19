@@ -3,6 +3,8 @@ from .auth import auth_router
 from .cargo import cargo_router
 from .shipment import shipments_router
 from .employee import employee_router
+from .order import order_router
+
 
 __all__ = [
     "truck_router",
@@ -10,4 +12,5 @@ __all__ = [
     "auth_router",
     "shipments_router",
     "employee_router",
+    "order_router",
 ]
