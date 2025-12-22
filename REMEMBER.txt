@@ -22,7 +22,7 @@ models — таблицы
 INSERT INTO employee (username, password_hash, role, email)
 VALUES (
   'admin',
-  '$2b$12$uK3ZQ9eYvQvYJZJ7ZxkU6u1zqZzjz0xZzjzjz0xZzjzjz0xZzjzjz',  -- сюда bcrypt-хэш
+  '$2b$12$uK3ZQ9eYvQvYJZJ7ZxkU6u1zqZzjz0xZzjzjz0xZzjzjz0xZzjzjz',  -- сюда хэш
   'admin',  -- или 'driver'
   'admin@example.com'
 );

@@ -10,7 +10,6 @@ shipments_router = APIRouter(
     prefix="/shipments",
 )
 
-
 @shipments_router.post("")
 async def create_shipment(
     shipment: ShipmentsCreate,

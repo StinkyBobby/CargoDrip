@@ -8,7 +8,6 @@ from .order_repo import OrderRepo
 
 from .sqlalchemy_repo import SQLalchemy
 
-
 __all__ = [
     "AbstractRepo",
     "TrucksRepo",

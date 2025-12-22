@@ -4,7 +4,7 @@ from datetime import datetime
 
 class EmployeeCreate(BaseModel):
     username: str = Field(..., max_length=100)
-    password: str = Field(..., min_length=6, max_length=72)
+    password: str = Field(..., min_length=6, max_length=64)  
     role: role_enum_new
     email: EmailStr
 

@@ -1,3 +1,4 @@
+from sqlite3 import IntegrityError
 from typing import List
 from fastapi import HTTPException
 from starlette import status
@@ -48,10 +49,15 @@ class CargoService():
         return CargoDTO.model_validate(updated)
     
     async def delete_cargo(self, cargo_id: int) -> CargoDTO:
-        cargo = await self.cargo_repo.delete(id=cargo_id)
-        if cargo is None:
+        try:
+            cargo = await self.cargo_repo.delete(id=cargo_id)
+        except IntegrityError as e:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Cargo is not found"
-            )
-            
-        return CargoDTO.model_validate(cargo) 
+                status_code=409,
+                detail="Нельзя удалить груз: на него есть ссылки в рейсах"
+            ) from e
+
+        if cargo is None:
+            raise HTTPException(status_code=404, detail="Груз не найден")
+
+        return CargoDTO.model_validate(cargo)

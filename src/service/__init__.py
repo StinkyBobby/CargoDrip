@@ -5,7 +5,6 @@ from .shipments_service import ShipmentsService
 from .employee_service import EmployeeService
 from .order_service import OrderService
 
-
 __all__ = [
     "TruckService",
     "CargoService",
