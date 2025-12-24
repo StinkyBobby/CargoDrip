@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CargoDrip Pro | Driver Dashboard</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root{
+      --bg: #090a0c;
+      --panel: rgba(255,255,255,0.06);
+      --panel2: rgba(255,255,255,0.09);
+      --line: rgba(255,255,255,0.10);
+
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.62);
+
+      --orange: #f97316;
+      --orange2: #fb923c;
+
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+
+      --shadow: 0 14px 40px rgba(0,0,0,.40);
+      --shadow2: 0 10px 26px rgba(0,0,0,.30);
+      --radius: 14px;
+      --transition: all .22s ease;
+    }
+
+    *{ margin: 0; padding: 0; box-sizing: border-box; }
+
+    body{
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(900px 520px at 12% 8%, rgba(249,115,22,0.22), transparent 60%),
+        radial-gradient(900px 560px at 88% 18%, rgba(251,146,60,0.14), transparent 58%),
+        radial-gradient(900px 650px at 50% 92%, rgba(249,115,22,0.12), transparent 60%),
+        var(--bg);
+      min-height: 100vh;
+      color: var(--text);
+      line-height: 1.5;
+      padding: 20px;
+    }
+
+    .container{
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .topbar{
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px 18px;
+      display:flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      backdrop-filter: blur(10px);
+    }
+
+    .title{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+    }
+
+    .title .icon{
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(249,115,22,0.14);
+      border: 1px solid rgba(255,255,255,0.14);
+      color: rgba(255,255,255,0.92);
+      box-shadow: var(--shadow2);
+      flex-shrink:0;
+    }
+
+    .title h1{
+      font-size: 18px;
+      font-weight: 1000;
+      letter-spacing: -0.4px;
+      color: rgba(255,255,255,0.95);
+      line-height: 1.2;
+    }
+
+    .title .sub{
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .actions{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn{
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.92);
+      border-radius: 12px;
+      padding: 10px 12px;
+      cursor:pointer;
+      font-weight: 1000;
+      transition: var(--transition);
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .btn:hover{ transform: translateY(-2px); box-shadow: var(--shadow2); }
+
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(249,115,22,0.92), rgba(251,146,60,0.72));
+      color: #fff;
+    }
+
+    .btn.danger{
+      background: linear-gradient(135deg, rgba(239,68,68,0.92), rgba(239,68,68,0.60));
+      color: #fff;
+    }
+
+    .card{
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px 18px;
+      backdrop-filter: blur(10px);
+    }
+
+    .section-head{
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 12px;
+    }
+
+    .section-head h2{
+      font-size: 15px;
+      font-weight: 1000;
+      color: rgba(255,255,255,0.95);
+      display:flex;
+      align-items:center;
+      gap: 10px;
+    }
+
+    .muted{ color: var(--muted); font-weight: 800; font-size: 12px; }
+
+    .table-container{
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.03);
+    }
+
+    table{
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 860px;
+    }
+
+    thead{
+      background: linear-gradient(135deg, rgba(249,115,22,0.92), rgba(251,146,60,0.55));
+    }
+
+    th{
+      padding: 12px 14px;
+      text-align:left;
+      color: rgba(255,255,255,0.95);
+      font-weight: 1000;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    td{
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.90);
+      font-size: 13px;
+      vertical-align: middle;
+    }
+
+    tbody tr:hover{ background: rgba(255,255,255,0.04); }
+
+    .badge{
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 1000;
+      display:inline-flex;
+      align-items:center;
+      gap: 7px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.92);
+      white-space: nowrap;
+    }
+
+    .badge.on_way{ border-color: rgba(249,115,22,0.45); }
+    .badge.delivered{ border-color: rgba(34,197,94,0.45); }
+    .badge.waiting{ border-color: rgba(245,158,11,0.45); }
+    .badge.queued{ border-color: rgba(245,158,11,0.45); }
+
+    .loading{
+      text-align:center;
+      padding: 26px 14px;
+      color: var(--muted);
+      font-weight: 900;
+    }
+
+    .spinner{
+      width: 32px;
+      height: 32px;
+      border: 3px solid rgba(255,255,255,0.18);
+      border-top: 3px solid rgba(249,115,22,0.90);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+
+    @keyframes spin{ 0%{ transform: rotate(0deg); } 100%{ transform: rotate(360deg); } }
+
+    @media (max-width: 700px){
+      body{ padding: 14px; }
+      .title .icon{ width: 40px; height: 40px; border-radius: 12px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="topbar">
+      <div class="title">
+        <div class="icon"><i class="fas fa-user-tie"></i></div>
+        <div>
+          <h1>Driver Dashboard</h1>
+          <div class="sub" id="whoami">Loading...</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" id="refresh"><i class="fas fa-sync-alt"></i> Refresh</button>
+        <button class="btn danger" id="logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-head">
+        <h2><i class="fas fa-truck"></i> Мои назначенные рейсы</h2>
+        <div class="muted" id="hint"></div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>From</th>
+              <th>To</th>
+              <th>Pickup</th>
+              <th>Status</th>
+              <th>Truck</th>
+              <th>Cargo</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr><td colspan="7" class="loading"><div class="spinner"></div>Загрузка...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const APIBASE = "http://localhost:8000";
+
+  function normalizeStatus(v){
+    return String(v ?? "").trim().toLowerCase().replace(/\s+/g, "_");
+  }
+
+  function logoutHard() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("token_type");
+    localStorage.removeItem("entered_from_login");
+    window.location.href = "/login";
+  }
+
+  function base64UrlDecode(str) {
+    str = str.replace(/-/g, "+").replace(/_/g, "/");
+    const pad = str.length % 4;
+    if (pad) str += "=".repeat(4 - pad);
+    return decodeURIComponent(
+      atob(str).split("").map(c => "%" + c.charCodeAt(0).toString(16).padStart(2, "0")).join("")
+    );
+  }
+
+  function decodeJwtPayload(token) {
+    const parts = String(token || "").split(".");
+    if (parts.length !== 3) throw new Error("Bad token format");
+    return JSON.parse(base64UrlDecode(parts[1]));
+  }
+
+  async function apiRequest(endpoint, options = {}) {
+    const token = localStorage.getItem("token");
+    const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    const url = endpoint.startsWith("http") ? endpoint : `${APIBASE}${endpoint}`;
+    const res = await fetch(url, { ...options, headers });
+    if (!res.ok) throw new Error(await res.text());
+    if (res.status === 204) return null;
+    return await res.json();
+  }
+
+  function renderRows(rows) {
+    const tbody = document.getElementById("tbody");
+
+    if (!rows.length) {
+      tbody.innerHTML = `<tr><td colspan="7" class="loading">Нет назначенных рейсов</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = rows.map(s => {
+      const st = normalizeStatus(s.status);
+      const badgeClass = st || "queued";
+      const pickup = s.pickup_date ? new Date(s.pickup_date).toLocaleString("ru-RU") : "-";
+
+      return `
+        <tr>
+          <td><strong>#${s.id}</strong></td>
+          <td>${s.from_location ?? "-"}</td>
+          <td>${s.to_location ?? "-"}</td>
+          <td>${pickup}</td>
+          <td><span class="badge ${badgeClass}">${s.status ?? "-"}</span></td>
+          <td>${s.truck_id ?? "-"}</td>
+          <td>${s.cargo_id ?? "-"}</td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  async function loadMyShipments() {
+    const token = localStorage.getItem("token");
+    const entered = localStorage.getItem("entered_from_login");
+
+    // 1) Пускаем только если переход был с login.html
+    if (!entered) return logoutHard();
+    if (!token) return logoutHard();
+
+    // 2) Проверка роли из JWT (role должен быть "driver")
+    let payload;
+    try {
+      payload = decodeJwtPayload(token);
+    } catch (e) {
+      console.error(e);
+      return logoutHard();
+    }
+
+    const userId = Number(payload.sub);
+    const role = payload.role;
+
+    if (!userId || role !== "driver") return logoutHard();
+
+    document.getElementById("whoami").textContent = `Driver ID: ${userId} • role: ${role}`;
+    document.getElementById("hint").textContent = "Показываются только shipments, назначенные этому водителю.";
+
+    // 3) “Одноразовый” флаг входа
+    localStorage.removeItem("entered_from_login");
+
+    // 4) Берём shipments и фильтруем по driver_deriver
+    const shipmentsData = await apiRequest("/shipments").catch(() => ({ items: [] }));
+    const all = shipmentsData.items || shipmentsData || [];
+
+    const mine = all.filter(s => Number(s.driver_deriver) === userId);
+    renderRows(mine);
+  }
+
+  document.getElementById("logout").addEventListener("click", logoutHard);
+  document.getElementById("refresh").addEventListener("click", () => loadMyShipments().catch(console.error));
+
+  document.addEventListener("DOMContentLoaded", () => {
+    loadMyShipments().catch(err => {
+      console.error(err);
+      logoutHard();
+    });
+  });
+</script>
+</body>
+</html>

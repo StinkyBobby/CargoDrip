@@ -34,15 +34,6 @@ def root():
     <p>Открой <a href='/docs'>Swagger</a> или <a href='/trucks-page'>таблицу грузовиков</a>.</p>
     """
 
-@app.get("/trucks-page", response_class=HTMLResponse)
-def trucks_page(request: Request):
-    try:
-        return templates.TemplateResponse("trucktable.html", {"request": request})
-    except Exception as e:
-        return HTMLResponse(
-            content=f"<h1>Ошибка загрузки страницы</h1><p>{e}</p>",
-            status_code=500
-        )
 
 @app.get("/login", response_class=HTMLResponse)
 def login_page(request: Request):

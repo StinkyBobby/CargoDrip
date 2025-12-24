@@ -1,0 +1,1888 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CargoDrip Pro | Admin Panel</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+  <style>
+    :root{
+      --bg: #090a0c;
+      --panel: rgba(255,255,255,0.06);
+      --panel2: rgba(255,255,255,0.09);
+      --line: rgba(255,255,255,0.10);
+
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.62);
+
+      --orange: #f97316;
+      --orange2: #fb923c;
+
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+
+      --shadow: 0 14px 40px rgba(0,0,0,.40);
+      --shadow2: 0 10px 26px rgba(0,0,0,.30);
+      --radius: 14px;
+      --transition: all .22s ease;
+    }
+
+    *{ margin: 0; padding: 0; box-sizing: border-box; }
+
+    body{
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(900px 520px at 12% 8%, rgba(249,115,22,0.22), transparent 60%),
+        radial-gradient(900px 560px at 88% 18%, rgba(251,146,60,0.14), transparent 58%),
+        radial-gradient(900px 650px at 50% 92%, rgba(249,115,22,0.12), transparent 60%),
+        var(--bg);
+      min-height: 100vh;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .dashboard-container{ display:flex; min-height:100vh; gap: 0; }
+
+    /* Sidebar */
+    .sidebar{
+      width: 290px;
+      background: rgba(255,255,255,0.04);
+      border-right: 1px solid var(--line);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      z-index: 100;
+      display:flex;
+      flex-direction: column;
+    }
+
+    .logo-area{
+      padding: 22px 20px;
+      border-bottom: 1px solid var(--line);
+      background:
+        radial-gradient(480px 140px at 20% 0%, rgba(249,115,22,0.30), transparent 60%),
+        linear-gradient(135deg, rgba(249,115,22,0.92), rgba(0,0,0,0.35));
+    }
+
+    .logo{ display:flex; align-items:center; gap: 12px; }
+
+    .logo-icon{
+      width: 44px; height: 44px;
+      border-radius: 14px;
+      display:flex; align-items:center; justify-content:center;
+      background: rgba(0,0,0,0.40);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: rgba(255,255,255,0.95);
+      box-shadow: var(--shadow2);
+    }
+
+    .logo-text h1{
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: -0.4px;
+      color: rgba(255,255,255,0.95);
+      line-height: 1.2;
+    }
+
+    .logo-text span{
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.70);
+    }
+
+    .nav-menu{ padding: 14px 0; flex:1; }
+
+    .nav-item{
+      display:flex; align-items:center; gap: 12px;
+      padding: 12px 18px;
+      width: 100%;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      color: var(--muted);
+      font-weight: 900;
+      font-size: 14px;
+      transition: var(--transition);
+      text-align:left;
+      border-left: 3px solid transparent;
+    }
+
+    .nav-item:hover{
+      background: rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.90);
+      padding-left: 22px;
+    }
+
+    .nav-item.active{
+      background: rgba(249,115,22,0.10);
+      color: rgba(255,255,255,0.95);
+      border-left-color: var(--orange);
+    }
+
+    .nav-item i{
+      width: 20px;
+      text-align:center;
+      color: rgba(255,255,255,0.75);
+    }
+
+    .nav-item.active i{ color: rgba(255,255,255,0.95); }
+
+    .user-area{
+      padding: 16px 18px;
+      border-top: 1px solid var(--line);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .user-info{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .user-avatar{
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      display:flex; align-items:center; justify-content:center;
+      background: rgba(249,115,22,0.18);
+      border: 1px solid rgba(255,255,255,0.14);
+      color: rgba(255,255,255,0.92);
+      font-weight: 1000;
+    }
+
+    .user-details h4{
+      font-size: 13px;
+      font-weight: 1000;
+      color: rgba(255,255,255,0.92);
+    }
+    .user-details span{
+      font-size: 12px;
+      color: rgba(255,255,255,0.60);
+      font-weight: 700;
+    }
+
+    .btn-logout{
+      width: 100%;
+      border-radius: 12px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.90);
+      cursor:pointer;
+      font-weight: 1000;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 8px;
+      transition: var(--transition);
+    }
+
+    .btn-logout:hover{
+      background: rgba(239,68,68,0.18);
+      border-color: rgba(239,68,68,0.35);
+    }
+
+    /* Main content */
+    .main-content{
+      flex:1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .dashboard-header{
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px 18px;
+      margin-bottom: 18px;
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap: 12px;
+      backdrop-filter: blur(10px);
+    }
+
+    .header-left h2{
+      font-size: 18px;
+      font-weight: 1000;
+      color: rgba(255,255,255,0.95);
+      display:flex;
+      align-items:center;
+      gap: 10px;
+    }
+
+    .header-left p{
+      color: rgba(255,255,255,0.62);
+      margin-top: 2px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .header-right{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn-action{
+      border: 1px solid rgba(255,255,255,0.14);
+      background: linear-gradient(135deg, rgba(249,115,22,0.92), rgba(251,146,60,0.72));
+      color: white;
+      border-radius: 12px;
+      padding: 10px 14px;
+      cursor:pointer;
+      font-weight: 1000;
+      transition: var(--transition);
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .btn-action:hover{ transform: translateY(-2px); box-shadow: var(--shadow2); }
+
+    .btn-action.secondary{ background: rgba(255,255,255,0.06); }
+    .btn-action.success{ background: linear-gradient(135deg, rgba(34,197,94,0.92), rgba(34,197,94,0.55)); }
+    .btn-action.danger{ background: linear-gradient(135deg, rgba(239,68,68,0.92), rgba(239,68,68,0.60)); }
+
+    .content-section{
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      margin-bottom: 18px;
+      display:none;
+      backdrop-filter: blur(10px);
+    }
+
+    .content-section.active{ display:block; animation: fadeIn .25s ease; }
+
+    @keyframes fadeIn{
+      from{ opacity:0; transform: translateY(10px); }
+      to{ opacity:1; transform: translateY(0); }
+    }
+
+    .section-header{
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap: 10px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .section-header h3{
+      color: rgba(255,255,255,0.92);
+      font-size: 15px;
+      font-weight: 1000;
+      display:flex;
+      align-items:center;
+      gap: 10px;
+    }
+
+    .export-options{ display:flex; gap: 8px; flex-wrap: wrap; }
+
+    .export-btn{
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.88);
+      font-weight: 900;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      transition: var(--transition);
+      font-size: 12px;
+    }
+
+    .export-btn:hover{
+      background: rgba(249,115,22,0.16);
+      border-color: rgba(249,115,22,0.30);
+      transform: translateY(-2px);
+    }
+
+    /* Stats */
+    .quick-stats{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .stat-card{
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow2);
+      padding: 14px 14px;
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before{
+      content:"";
+      position:absolute;
+      inset: -1px;
+      background:
+        radial-gradient(240px 80px at 15% 10%, rgba(249,115,22,0.20), transparent 60%),
+        radial-gradient(220px 90px at 85% 30%, rgba(251,146,60,0.12), transparent 60%);
+      pointer-events:none;
+      opacity: .7;
+    }
+
+    .stat-card > *{ position: relative; z-index: 1; }
+    .stat-card:hover{ transform: translateY(-2px); }
+
+    .stat-icon{
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(249,115,22,0.14);
+      border: 1px solid rgba(255,255,255,0.14);
+      color: rgba(255,255,255,0.92);
+      flex-shrink:0;
+    }
+
+    .stat-value{
+      font-size: 22px;
+      font-weight: 1000;
+      color: rgba(255,255,255,0.95);
+      line-height: 1.1;
+    }
+
+    .stat-label{
+      color: rgba(255,255,255,0.62);
+      font-size: 12px;
+      font-weight: 800;
+      margin-top: 4px;
+    }
+
+    /* Tables */
+    .table-container{
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .data-table{
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 860px;
+    }
+
+    .data-table thead{
+      background: linear-gradient(135deg, rgba(249,115,22,0.92), rgba(251,146,60,0.55));
+    }
+
+    .data-table th{
+      padding: 12px 14px;
+      text-align:left;
+      color: rgba(255,255,255,0.95);
+      font-weight: 1000;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    .data-table td{
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.90);
+      font-size: 13px;
+      vertical-align: middle;
+    }
+
+    .data-table tbody tr:hover{ background: rgba(255,255,255,0.04); }
+
+    /* Badges */
+    .status-badge{
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 1000;
+      display:inline-flex;
+      align-items:center;
+      gap: 7px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.92);
+    }
+
+    .status-queued{ border-color: rgba(245,158,11,0.45); }
+    .status-assigned{ border-color: rgba(59,130,246,0.40); }
+    .status-on_way{ border-color: rgba(249,115,22,0.45); }
+    .status-delivered{ border-color: rgba(34,197,94,0.45); }
+
+    /* Actions */
+    .actions-cell{ display:flex; gap: 8px; flex-wrap: wrap; }
+
+    .action-btn{
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.14);
+      cursor:pointer;
+      font-size: 12px;
+      font-weight: 1000;
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      transition: var(--transition);
+      background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.90);
+    }
+
+    .action-btn:hover{ transform: translateY(-2px); }
+    .action-btn.success{ background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.25); }
+    .action-btn.danger{ background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.25); }
+    .action-btn.secondary{ background: rgba(255,255,255,0.05); }
+
+    /* Modals */
+    .modal-overlay{
+      display:none;
+      position: fixed;
+      top:0; left:0;
+      width:100%; height:100%;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(6px);
+      z-index: 1000;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+    }
+    .modal-overlay.active{ display:flex; }
+
+    .modal{
+      width: 100%;
+      max-width: 520px;
+      border-radius: 16px;
+      background: rgba(10,12,18,0.72);
+      border: 1px solid rgba(255,255,255,0.14);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    .modal-header{
+      padding: 16px 18px;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+      background:
+        radial-gradient(520px 120px at 20% 0%, rgba(249,115,22,0.20), transparent 60%),
+        rgba(255,255,255,0.04);
+    }
+
+    .modal-header h3{
+      font-size: 15px;
+      font-weight: 1000;
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      color: rgba(255,255,255,0.95);
+    }
+
+    .close-modal{
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.14);
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      cursor:pointer;
+      color: rgba(255,255,255,0.85);
+      font-size: 18px;
+      transition: var(--transition);
+    }
+    .close-modal:hover{
+      background: rgba(239,68,68,0.14);
+      border-color: rgba(239,68,68,0.30);
+    }
+
+    .modal-body{ padding: 16px 18px 18px; }
+
+    .form-group{ margin-bottom: 12px; }
+
+    .form-group label{
+      display:block;
+      margin-bottom: 6px;
+      color: rgba(255,255,255,0.80);
+      font-weight: 900;
+      font-size: 13px;
+    }
+
+    .form-group input, .form-group select{
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.92);
+      transition: var(--transition);
+      font-size: 13px;
+      outline:none;
+    }
+
+    .form-group input:focus, .form-group select:focus{
+      border-color: rgba(249,115,22,0.55);
+      box-shadow: 0 0 0 3px rgba(249,115,22,0.12);
+    }
+
+    .form-group select option{
+      background: #0b0d12 !important;
+      color: #f4f4f5 !important;
+    }
+
+    .btn-submit{
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: linear-gradient(135deg, rgba(249,115,22,0.92), rgba(251,146,60,0.72));
+      color: white;
+      font-weight: 1000;
+      cursor:pointer;
+      transition: var(--transition);
+      margin-top: 4px;
+    }
+
+    .btn-submit:hover{ transform: translateY(-2px); }
+
+    /* Notification */
+    .notification{
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(10,12,18,0.75);
+      color: rgba(255,255,255,0.95);
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+      z-index: 2000;
+      display:none;
+      min-width: 320px;
+      max-width: 420px;
+      font-weight: 900;
+    }
+
+    .notification.show{ display:block; }
+    .notification.success{ border-color: rgba(34,197,94,0.35); }
+    .notification.error{ border-color: rgba(239,68,68,0.40); }
+    .notification.info{ border-color: rgba(249,115,22,0.35); }
+
+    .loading{
+      text-align:center;
+      padding: 26px 14px;
+      color: rgba(255,255,255,0.65);
+      font-weight: 900;
+    }
+
+    .spinner{
+      width: 32px;
+      height: 32px;
+      border: 3px solid rgba(255,255,255,0.18);
+      border-top: 3px solid rgba(249,115,22,0.90);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+
+    @keyframes spin{ 0%{ transform: rotate(0deg); } 100%{ transform: rotate(360deg); } }
+
+    /* Charts */
+    .charts-grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .chart-card{
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow2);
+      padding: 14px;
+    }
+
+    .chart-header{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .chart-header h4{
+      font-size: 14px;
+      font-weight: 1000;
+      color: rgba(255,255,255,0.92);
+      display:flex;
+      align-items:center;
+      gap: 8px;
+    }
+
+    .chart-container{ height: 260px; position: relative; }
+
+    /* Responsive */
+    @media (max-width: 1100px){
+      .dashboard-container{ flex-direction: column; }
+      .sidebar{ width: 100%; height: auto; position: relative; }
+    }
+  </style>
+</head>
+
+<body>
+<div class="dashboard-container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="logo-area">
+      <div class="logo">
+        <div class="logo-icon"><i class="fas fa-shipping-fast"></i></div>
+        <div class="logo-text">
+          <h1>CargoDrip Pro</h1>
+          <span>Logistics Management System</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-menu">
+      <button class="nav-item active" data-section="overview"><i class="fas fa-tachometer-alt"></i> Dashboard</button>
+      <button class="nav-item" data-section="cargoes"><i class="fas fa-box"></i> Cargo</button>
+      <button class="nav-item" data-section="orders"><i class="fas fa-clipboard-list"></i> Orders</button>
+      <button class="nav-item" data-section="shipments"><i class="fas fa-truck"></i> Shipments</button>
+      <button class="nav-item" data-section="trucks"><i class="fas fa-truck-moving"></i> Trucks</button>
+      <button class="nav-item" data-section="drivers"><i class="fas fa-users"></i> Drivers</button>
+      <button class="nav-item" data-section="reports"><i class="fas fa-chart-bar"></i> Reports</button>
+    </div>
+
+    <div class="user-area">
+      <div class="user-info">
+        <div class="user-avatar" id="admin-avatar">A</div>
+        <div class="user-details">
+          <h4 id="admin-name">Administrator</h4>
+          <span id="admin-email">admin@cargodrip.com</span>
+        </div>
+      </div>
+      <button id="logout-btn" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="main-content">
+    <!-- Header -->
+    <div class="dashboard-header">
+      <div class="header-left">
+        <h2><i class="fas fa-tachometer-alt"></i> <span id="section-title">Dashboard Overview</span></h2>
+        <p id="section-description">Real-time system monitoring and analytics</p>
+      </div>
+      <div class="header-right">
+        <span id="current-time" style="color: rgba(255,255,255,0.65); font-weight: 900; font-size: 12px;"></span>
+        <button id="refresh-btn" class="btn-action" style="padding: 10px 12px;">
+          <i class="fas fa-sync-alt"></i> Refresh
+        </button>
+      </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <!-- Overview -->
+    <section id="overview" class="content-section active">
+      <div class="quick-stats">
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-box"></i></div>
+          <div>
+            <div class="stat-value" id="stat-total-cargoes">0</div>
+            <div class="stat-label">Total Cargo Items</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-clipboard-list"></i></div>
+          <div>
+            <div class="stat-value" id="stat-pending-orders">0</div>
+            <div class="stat-label">Pending Orders (queued)</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-truck"></i></div>
+          <div>
+            <div class="stat-value" id="stat-active-shipments">0</div>
+            <div class="stat-label">Active Shipments (on_way)</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-truck-moving"></i></div>
+          <div>
+            <div class="stat-value" id="stat-free-trucks">0</div>
+            <div class="stat-label">Available Trucks</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <h4><i class="fas fa-chart-pie"></i> Shipment Status (real data)</h4>
+          </div>
+          <div class="chart-container">
+            <canvas id="statusChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cargoes -->
+    <section id="cargoes" class="content-section">
+      <div class="section-header">
+        <h3><i class="fas fa-box"></i> Cargo Management</h3>
+        <div style="display:flex; gap: 10px; flex-wrap: wrap;">
+          <div class="export-options">
+            <button class="export-btn" onclick="exportData('cargoes','excel')"><i class="fas fa-file-excel"></i> Excel</button>
+            <button class="export-btn" onclick="exportData('cargoes','csv')"><i class="fas fa-file-csv"></i> CSV</button>
+            <button class="export-btn" onclick="exportData('cargoes','pdf')"><i class="fas fa-file-pdf"></i> PDF</button>
+          </div>
+          <button class="btn-action" onclick="showModal('cargo')"><i class="fas fa-plus"></i> Add Cargo</button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+          <tr>
+            <th>ID</th><th>Title</th><th>Sender</th><th>Recipient</th><th>Weight</th><th>Volume</th><th>Actions</th>
+          </tr>
+          </thead>
+          <tbody id="cargoes-tbody">
+            <tr><td colspan="7" class="loading"><div class="spinner"></div>Loading cargo...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Orders -->
+    <section id="orders" class="content-section">
+      <div class="section-header">
+        <h3><i class="fas fa-clipboard-list"></i> Orders Management</h3>
+        <div style="display:flex; gap: 10px; flex-wrap: wrap;">
+          <div class="export-options">
+            <button class="export-btn" onclick="exportData('orders','excel')"><i class="fas fa-file-excel"></i> Excel</button>
+            <button class="export-btn" onclick="exportData('orders','word')"><i class="fas fa-file-word"></i> Word</button>
+            <button class="export-btn" onclick="exportData('orders','txt')"><i class="fas fa-file-alt"></i> TXT</button>
+          </div>
+          <button class="btn-action" onclick="showModal('order')"><i class="fas fa-plus"></i> Create Order</button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+          <tr>
+            <th>ID</th><th>Cargo</th><th>Destination</th><th>Distance</th><th>Status</th><th>Price</th><th>Actions</th>
+          </tr>
+          </thead>
+          <tbody id="orders-tbody">
+            <tr><td colspan="7" class="loading"><div class="spinner"></div>Loading orders...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Shipments -->
+    <section id="shipments" class="content-section">
+      <div class="section-header">
+        <h3><i class="fas fa-truck"></i> Shipments Management</h3>
+        <div class="export-options">
+          <button class="export-btn" onclick="exportData('shipments','excel')"><i class="fas fa-file-excel"></i> Excel</button>
+          <button class="export-btn" onclick="exportData('shipments','csv')"><i class="fas fa-file-csv"></i> CSV</button>
+          <button class="export-btn" onclick="exportData('shipments','json')"><i class="fas fa-file-code"></i> JSON</button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+          <tr>
+            <th>ID</th><th>Cargo</th><th>Truck</th><th>From</th><th>To</th><th>Pickup Date</th><th>Status</th><th>Actions</th>
+          </tr>
+          </thead>
+          <tbody id="shipments-tbody">
+            <tr><td colspan="8" class="loading"><div class="spinner"></div>Loading shipments...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Trucks -->
+    <section id="trucks" class="content-section">
+      <div class="section-header">
+        <h3><i class="fas fa-truck-moving"></i> Trucks Management</h3>
+        <div style="display:flex; gap: 10px; flex-wrap: wrap;">
+          <div class="export-options">
+            <button class="export-btn" onclick="exportData('trucks','excel')"><i class="fas fa-file-excel"></i> Excel</button>
+            <button class="export-btn" onclick="exportData('trucks','csv')"><i class="fas fa-file-csv"></i> CSV</button>
+          </div>
+          <button class="btn-action" onclick="showModal('truck')"><i class="fas fa-plus"></i> Add Truck</button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+          <tr>
+            <th>ID</th><th>Plate</th><th>Model</th><th>Capacity</th><th>Volume</th><th>Available</th><th>Actions</th>
+          </tr>
+          </thead>
+          <tbody id="trucks-tbody">
+            <tr><td colspan="7" class="loading"><div class="spinner"></div>Loading trucks...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Drivers -->
+    <section id="drivers" class="content-section">
+      <div class="section-header">
+        <h3><i class="fas fa-users"></i> Drivers Management</h3>
+        <div style="display:flex; gap: 10px; flex-wrap: wrap;">
+          <div class="export-options">
+            <button class="export-btn" onclick="exportData('drivers','excel')"><i class="fas fa-file-excel"></i> Excel</button>
+            <button class="export-btn" onclick="exportData('drivers','csv')"><i class="fas fa-file-csv"></i> CSV</button>
+            <button class="export-btn" onclick="exportData('drivers','txt')"><i class="fas fa-file-alt"></i> TXT</button>
+          </div>
+          <button class="btn-action" onclick="showModal('driver')"><i class="fas fa-plus"></i> Add Driver</button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+          <tr>
+            <th>ID</th><th>Username</th><th>Email</th><th>Role</th><th>Created</th><th>Actions</th>
+          </tr>
+          </thead>
+          <tbody id="drivers-tbody">
+            <tr><td colspan="6" class="loading"><div class="spinner"></div>Loading drivers...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Reports -->
+    <section id="reports" class="content-section">
+      <div class="section-header">
+        <h3><i class="fas fa-chart-bar"></i> Reports (real KPIs)</h3>
+        <button class="btn-action success" onclick="generateFullReport()"><i class="fas fa-download"></i> Generate Full Report</button>
+      </div>
+
+      <div class="quick-stats" style="margin-top: 10px;">
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div>
+          <div>
+            <div class="stat-value" id="total-revenue">0</div>
+            <div class="stat-label">Total Revenue</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-road"></i></div>
+          <div>
+            <div class="stat-value" id="total-distance">0</div>
+            <div class="stat-label">Total Distance (km)</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-weight-hanging"></i></div>
+          <div>
+            <div class="stat-value" id="total-weight">0</div>
+            <div class="stat-label">Total Weight (kg)</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-percentage"></i></div>
+          <div>
+            <div class="stat-value" id="success-rate">0%</div>
+            <div class="stat-label">Success Rate</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 12px; display:flex; gap: 10px; flex-wrap: wrap;">
+        <button class="btn-action" onclick="exportFullReport('excel')"><i class="fas fa-file-excel"></i> Excel Report</button>
+        <button class="btn-action secondary" onclick="exportFullReport('pdf')"><i class="fas fa-file-pdf"></i> PDF Report</button>
+        <button class="btn-action success" onclick="exportFullReport('csv')"><i class="fas fa-file-csv"></i> CSV Report</button>
+        <button class="btn-action" onclick="exportFullReport('json')"><i class="fas fa-file-code"></i> JSON Data</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- Modals -->
+<div class="modal-overlay" id="cargo-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-box"></i> Add New Cargo</h3>
+      <button class="close-modal" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="cargo-form">
+        <div class="form-group">
+          <label>Title *</label>
+          <input type="text" id="cargo-title" placeholder="Electronics, Furniture, etc." required>
+        </div>
+        <div class="form-group">
+          <label>Sender *</label>
+          <input type="text" id="cargo-sender" placeholder="Company LLC" required>
+        </div>
+        <div class="form-group">
+          <label>Recipient *</label>
+          <input type="text" id="cargo-recipient" placeholder="Recipient Name" required>
+        </div>
+        <div class="form-group">
+          <label>Weight (kg) *</label>
+          <input type="number" id="cargo-weight" min="1" placeholder="100" required>
+        </div>
+        <div class="form-group">
+          <label>Volume (m³) *</label>
+          <input type="number" id="cargo-volume" min="1" placeholder="5" required>
+        </div>
+        <button type="submit" class="btn-submit">Add Cargo</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="order-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-clipboard-list"></i> Create New Order</h3>
+      <button class="close-modal" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="order-form">
+        <div class="form-group">
+          <label>Select Cargo *</label>
+          <select id="order-cargo" required>
+            <option value="">-- Select Cargo --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Destination *</label>
+          <input type="text" id="order-to" placeholder="City, Street, Building" required>
+        </div>
+        <div class="form-group">
+          <label>Distance (km) *</label>
+          <input type="number" id="order-distance" min="1" placeholder="300" required>
+        </div>
+        <button type="submit" class="btn-submit">Create Order</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="shipment-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-truck-loading"></i> Assign Shipment</h3>
+      <button class="close-modal" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="shipment-form">
+        <input type="hidden" id="modal-order-id">
+        <div class="form-group">
+          <label>Order ID</label>
+          <input type="text" id="modal-order-info" readonly>
+        </div>
+        <div class="form-group">
+          <label>Cargo Info</label>
+          <input type="text" id="modal-cargo-info" readonly>
+        </div>
+        <div class="form-group">
+          <label>Select Driver *</label>
+          <select id="modal-driver-select" required>
+            <option value="">-- Select Driver --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Select Truck *</label>
+          <select id="modal-truck-select" required>
+            <option value="">-- Select Truck --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>From Location *</label>
+          <input type="text" id="modal-from-location" value="Warehouse" required>
+        </div>
+        <button type="submit" class="btn-submit">Assign Shipment</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="truck-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-truck"></i> Add New Truck</h3>
+      <button class="close-modal" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="truck-form">
+        <div class="form-group">
+          <label>License Plate *</label>
+          <input type="text" id="truck-plate" placeholder="ABC123" required>
+        </div>
+        <div class="form-group">
+          <label>Model *</label>
+          <input type="text" id="truck-model" placeholder="MAN TGS" required>
+        </div>
+        <div class="form-group">
+          <label>Capacity (kg) *</label>
+          <input type="number" id="truck-capacity" min="1" placeholder="20000" required>
+        </div>
+        <div class="form-group">
+          <label>Volume (m³) *</label>
+          <input type="number" id="truck-volume" min="1" placeholder="86" required>
+        </div>
+        <button type="submit" class="btn-submit">Add Truck</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="driver-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-user-tie"></i> Add New Driver</h3>
+      <button class="close-modal" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="driver-form">
+        <div class="form-group">
+          <label>Username *</label>
+          <input type="text" id="driver-username" placeholder="driver_john" required>
+        </div>
+        <div class="form-group">
+          <label>Password *</label>
+          <input type="password" id="driver-password" required minlength="6">
+        </div>
+        <div class="form-group">
+          <label>Email *</label>
+          <input type="email" id="driver-email" placeholder="john@cargodrip.com" required>
+        </div>
+        <button type="submit" class="btn-submit">Add Driver</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const APIBASE = "http://localhost:8000";
+
+  let cargoes = [], orders = [], shipments = [], trucks = [], drivers = [];
+  let currentOrderForAssignment = null;
+  let charts = {};
+
+  function showNotification(message, type = "success") {
+    const n = document.getElementById("notification");
+    n.textContent = message;
+    n.className = `notification ${type} show`;
+    setTimeout(() => n.classList.remove("show"), 2800);
+  }
+
+  function normalizeStatus(v){
+    return String(v ?? "").trim().toLowerCase().replace(/\s+/g, "_");
+  }
+
+  function setupNavigation() {
+    const navItems = document.querySelectorAll(".nav-item");
+    const sections = document.querySelectorAll(".content-section");
+    const titles = {
+      overview: { title: "Dashboard Overview", desc: "Real-time system monitoring and analytics" },
+      cargoes: { title: "Cargo Management", desc: "Manage cargo items and inventory" },
+      orders: { title: "Orders Management", desc: "Create and track transportation orders" },
+      shipments: { title: "Shipments Management", desc: "Monitor active shipments and deliveries" },
+      trucks: { title: "Trucks Management", desc: "Manage truck fleet and availability" },
+      drivers: { title: "Drivers Management", desc: "Manage drivers and assignments" },
+      reports: { title: "Reports", desc: "Real KPIs based on your data" }
+    };
+
+    navItems.forEach(item => {
+      item.addEventListener("click", () => {
+        const sectionId = item.dataset.section;
+        const data = titles[sectionId];
+
+        navItems.forEach(nav => nav.classList.remove("active"));
+        sections.forEach(section => section.classList.remove("active"));
+
+        item.classList.add("active");
+        document.getElementById(sectionId).classList.add("active");
+
+        document.getElementById("section-title").textContent = data.title;
+        document.getElementById("section-description").textContent = data.desc;
+      });
+    });
+  }
+
+  function updateTime() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
+    const dateString = now.toLocaleDateString("ru-RU", { weekday: "short", day: "numeric", month: "short" });
+    document.getElementById("current-time").textContent = `${dateString} • ${timeString}`;
+  }
+
+  function setupLogout() {
+    document.getElementById("logout-btn").addEventListener("click", () => {
+      localStorage.clear();
+      window.location.href = "/login";
+    });
+
+    const username = localStorage.getItem("username") || "Admin";
+    document.getElementById("admin-name").textContent = username;
+    document.getElementById("admin-email").textContent = localStorage.getItem("email") || "admin@cargodrip.com";
+    document.getElementById("admin-avatar").textContent = username.charAt(0).toUpperCase();
+  }
+
+  async function apiRequest(endpoint, options = {}) {
+    const token = localStorage.getItem("token");
+    const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    const url = endpoint.startsWith("http") ? endpoint : `${APIBASE}${endpoint}`;
+    const res = await fetch(url, { ...options, headers });
+
+    if (!res.ok) {
+      let msg = `Error ${res.status}`;
+      try {
+        const data = await res.json();
+        msg = typeof data.detail === "string" ? data.detail : JSON.stringify(data.detail ?? data);
+      } catch {
+        try { msg = await res.text(); } catch {}
+      }
+      throw new Error(msg);
+    }
+    if (res.status === 204) return null;
+    return await res.json();
+  }
+
+  async function loadAllData() {
+    try {
+      const [cargoData, ordersData, shipmentsData, trucksData, employeesData] = await Promise.all([
+        apiRequest("/cargoes").catch(() => ({ items: [] })),
+        apiRequest("/orders").catch(() => ({ items: [] })),
+        apiRequest("/shipments").catch(() => ({ items: [] })),
+        apiRequest("/trucks").catch(() => ({ items: [] })),
+        apiRequest("/employees").catch(() => ([]))
+      ]);
+
+      cargoes = cargoData?.items || cargoData || [];
+      orders = ordersData?.items || ordersData || [];
+      shipments = shipmentsData?.items || shipmentsData || [];
+      trucks = trucksData?.items || trucksData || [];
+
+      const emps = employeesData?.items || employeesData || [];
+      drivers = emps.filter(e => e.role === "driver");
+
+      renderAll();
+      updateCharts();
+      updateReports();
+    } catch (e) {
+      console.error("Load error:", e);
+      showNotification("Failed to load data", "error");
+    }
+  }
+
+  function renderAll() {
+    renderCargoes();
+    renderOrders();
+    renderShipments();
+    renderTrucks();
+    renderDrivers();
+  }
+
+  // ====== NEW: driver availability logic ======
+  function driverHasActiveShipment(driverId) {
+    return shipments.some(s =>
+      Number(s.driver_deriver) === Number(driverId) &&
+      ["waiting", "on_way"].includes(normalizeStatus(s.status))
+    );
+  }
+
+  function getFreeDrivers() {
+    return drivers.filter(d => !driverHasActiveShipment(d.id));
+  }
+  // ===========================================
+
+  function renderCargoes() {
+    const tbody = document.getElementById("cargoes-tbody");
+    if (!cargoes.length) {
+      tbody.innerHTML = `<tr><td colspan="7" class="loading">No cargo found</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = cargoes.map(c => `
+      <tr>
+        <td><strong>#${c.id}</strong></td>
+        <td><strong>${c.title}</strong></td>
+        <td>${c.sender}</td>
+        <td>${c.recipient}</td>
+        <td>${c.weight} kg</td>
+        <td>${c.volume} m³</td>
+        <td>
+          <div class="actions-cell">
+            <button onclick="deleteCargo(${c.id})" class="action-btn danger">
+              <i class="fas fa-trash"></i> Delete
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join("");
+  }
+
+  async function deleteCargo(id) {
+    if (!confirm("Delete this cargo?")) return;
+    try {
+      await apiRequest(`/cargoes/${id}`, { method: "DELETE" });
+      cargoes = cargoes.filter(x => x.id !== id);
+      renderCargoes();
+      updateStats();
+      showNotification("Cargo deleted", "success");
+    } catch {
+      showNotification("Delete failed", "error");
+    }
+  }
+
+  function renderOrders() {
+    const tbody = document.getElementById("orders-tbody");
+    if (!orders.length) {
+      tbody.innerHTML = `<tr><td colspan="7" class="loading">No orders found</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = orders.map(o => {
+      const cargo = cargoes.find(c => Number(c.id) === Number(o.cargo_id));
+      const statusClass = normalizeStatus(o.status);
+      const isQueued = normalizeStatus(o.status) === "queued";
+
+      return `
+        <tr>
+          <td><strong>#${o.id}</strong></td>
+          <td>${cargo ? cargo.title : `Cargo #${o.cargo_id}`}</td>
+          <td>${o.to_location ?? "-"}</td>
+          <td>${o.distance_km ?? "-"} km</td>
+          <td><span class="status-badge status-${statusClass}">${o.status ?? "-"}</span></td>
+          <td>${o.price != null ? `${o.price}` : "-"}</td>
+          <td>
+            <div class="actions-cell">
+              ${isQueued ? `
+                <button onclick="assignShipment(${o.id})" class="action-btn success">
+                  <i class="fas fa-truck-loading"></i> Assign
+                </button>
+              ` : `
+                <span class="action-btn secondary">Assigned</span>
+              `}
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  async function assignShipment(orderId) {
+    const order = orders.find(o => Number(o.id) === Number(orderId));
+    if (!order) return showNotification("Order not found", "error");
+
+    const cargo = cargoes.find(c => Number(c.id) === Number(order.cargo_id));
+    if (!cargo) return showNotification("Cargo not found", "error");
+
+    const availableTrucks = trucks.filter(t => !!t.available);
+    if (!availableTrucks.length) return showNotification("No available trucks", "error");
+
+    const freeDrivers = getFreeDrivers();
+    if (!freeDrivers.length) return showNotification("No free drivers available", "error");
+
+    document.getElementById("modal-order-id").value = orderId;
+    document.getElementById("modal-order-info").value = `Order #${orderId}`;
+    document.getElementById("modal-cargo-info").value = `${cargo.title} (${cargo.weight}kg)`;
+
+    const driverSelect = document.getElementById("modal-driver-select");
+    driverSelect.innerHTML = `<option value="">-- Select Driver --</option>` +
+      freeDrivers.map(d => `<option value="${d.id}">${d.username} (ID: ${d.id})</option>`).join("");
+
+    const truckSelect = document.getElementById("modal-truck-select");
+    truckSelect.innerHTML = `<option value="">-- Select Truck --</option>` +
+      availableTrucks.map(t => `<option value="${t.id}">${t.plate_number} (${t.model})</option>`).join("");
+
+    currentOrderForAssignment = order;
+    showModal("shipment");
+  }
+
+  document.getElementById("shipment-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    if (!currentOrderForAssignment) return showNotification("Order data missing", "error");
+
+    const order = currentOrderForAssignment;
+    const driverId = document.getElementById("modal-driver-select").value;
+    const truckId = document.getElementById("modal-truck-select").value;
+    const fromLocation = document.getElementById("modal-from-location").value.trim();
+
+    if (!driverId || !truckId) return showNotification("Select driver and truck", "error");
+
+    // дополнительная защита от гонки (если данные устарели)
+    if (driverHasActiveShipment(driverId)) return showNotification("Driver already busy", "error");
+
+    try {
+      const payload = {
+        cargo_id: Number(order.cargo_id),
+        truck_id: Number(truckId),
+        from_location: fromLocation,
+        to_location: order.to_location,
+        pickup_date: new Date().toISOString(),
+        delivered_date: null,
+        driver_deriver: Number(driverId),
+        status: "on_way"
+      };
+
+      await apiRequest("/shipments", { method: "POST", body: JSON.stringify(payload) });
+      await apiRequest(`/trucks/${truckId}/availability?available=false`, { method: "PATCH" });
+
+      // NEW: удаляем заявку после назначения (orders -> shipments)
+      try {
+        await apiRequest(`/orders/${order.id}`, { method: "DELETE" });
+      } catch (err) {
+        // если на бэке нет delete, хотя бы прячем в UI
+        console.error("Order delete failed (UI will still refresh):", err);
+      }
+
+      closeModal();
+
+      // сразу чистим из UI (быстрее ощущается)
+      orders = orders.filter(o => Number(o.id) !== Number(order.id));
+      renderOrders();
+
+      await loadAllData();
+      showNotification("Shipment assigned", "success");
+    } catch (err) {
+      console.error(err);
+      showNotification(`Assign failed: ${err.message}`, "error");
+    }
+  });
+
+  function renderShipments() {
+    const tbody = document.getElementById("shipments-tbody");
+    if (!shipments.length) {
+      tbody.innerHTML = `<tr><td colspan="8" class="loading">No shipments found</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = shipments.map(s => {
+      const cargo = cargoes.find(c => Number(c.id) === Number(s.cargo_id));
+      const truck = trucks.find(t => Number(t.id) === Number(s.truck_id));
+      const statusClass = normalizeStatus(s.status);
+      const pickupDate = s.pickup_date ? new Date(s.pickup_date).toLocaleDateString("ru-RU") : "-";
+      const onWay = normalizeStatus(s.status) === "on_way";
+
+      return `
+        <tr>
+          <td><strong>#${s.id}</strong></td>
+          <td>${cargo ? cargo.title : `Cargo #${s.cargo_id}`}</td>
+          <td>${truck ? truck.plate_number : `Truck #${s.truck_id}`}</td>
+          <td>${s.from_location ?? "-"}</td>
+          <td>${s.to_location ?? "-"}</td>
+          <td>${pickupDate}</td>
+          <td><span class="status-badge status-${statusClass}">${s.status ?? "-"}</span></td>
+          <td>
+            <div class="actions-cell">
+              ${onWay ? `
+                <button onclick="completeShipment(${s.id})" class="action-btn success">
+                  <i class="fas fa-check"></i> Delivered
+                </button>
+              ` : `
+                <span class="action-btn secondary">Completed</span>
+              `}
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  // NEW: delivered без ошибок + удаление shipment
+  async function completeShipment(shipmentId) {
+    if (!confirm("Mark as delivered?")) return;
+
+    try {
+      // пробуем поставить статус delivered (если у тебя так принято)
+      await apiRequest(`/shipments/${shipmentId}/status?status=${encodeURIComponent("delivered")}`, { method: "PATCH" });
+
+      const shipment = shipments.find(s => Number(s.id) === Number(shipmentId));
+
+      // освобождаем машину
+      if (shipment?.truck_id) {
+        await apiRequest(`/trucks/${shipment.truck_id}/availability?available=true`, { method: "PATCH" });
+      }
+
+      // NEW: удаляем shipment полностью
+      try {
+        await apiRequest(`/shipments/${shipmentId}`, { method: "DELETE" });
+      } catch (err) {
+        console.error("Shipment delete failed:", err);
+      }
+
+      // убираем из UI мгновенно
+      shipments = shipments.filter(s => Number(s.id) !== Number(shipmentId));
+      renderShipments();
+      updateCharts();
+      updateReports();
+    } catch (err) {
+      // НИ ОДНОЙ ошибки/уведомления пользователю
+      console.error("Delivered click error (ignored):", err);
+    } finally {
+      // на всякий случай синхронизируем всё
+      await loadAllData();
+    }
+  }
+
+  function renderTrucks() {
+    const tbody = document.getElementById("trucks-tbody");
+    if (!trucks.length) {
+      tbody.innerHTML = `<tr><td colspan="7" class="loading">No trucks found</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = trucks.map(t => `
+      <tr>
+        <td><strong>#${t.id}</strong></td>
+        <td><strong>${t.plate_number ?? "-"}</strong></td>
+        <td>${t.model ?? "-"}</td>
+        <td>${Number(t.capacity_kg ?? 0).toLocaleString()} kg</td>
+        <td>${t.volume_m3 ?? "-"} m³</td>
+        <td>${t.available ? `<span style="color:${getComputedStyle(document.documentElement).getPropertyValue('--success')}; font-weight:1000;">Yes</span>` : `<span style="color:${getComputedStyle(document.documentElement).getPropertyValue('--danger')}; font-weight:1000;">No</span>`}</td>
+        <td>
+          <div class="actions-cell">
+            <button onclick="toggleTruck(${t.id}, ${!t.available})" class="action-btn ${t.available ? 'secondary' : 'success'}">
+              ${t.available ? 'Take' : 'Release'}
+            </button>
+            <button onclick="deleteTruck(${t.id})" class="action-btn danger"><i class="fas fa-trash"></i> Delete</button>
+          </div>
+        </td>
+      </tr>
+    `).join("");
+  }
+
+  async function toggleTruck(truckId, available) {
+    const action = available ? "release" : "take";
+    if (!confirm(`Are you sure you want to ${action} this truck?`)) return;
+
+    try {
+      await apiRequest(`/trucks/${truckId}/availability?available=${available}`, { method: "PATCH" });
+      await loadAllData();
+      showNotification(`Truck ${available ? "released" : "taken"}`, "success");
+    } catch {
+      showNotification("Toggle failed", "error");
+    }
+  }
+
+  async function deleteTruck(id) {
+    if (!confirm("Delete this truck?")) return;
+    try {
+      await apiRequest(`/trucks/${id}`, { method: "DELETE" });
+      await loadAllData();
+      showNotification("Truck deleted", "success");
+    } catch {
+      showNotification("Delete failed", "error");
+    }
+  }
+
+  function renderDrivers() {
+    const tbody = document.getElementById("drivers-tbody");
+    if (!drivers.length) {
+      tbody.innerHTML = `<tr><td colspan="6" class="loading">No drivers found</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = drivers.map(d => {
+      const createdDate = d.created_at ? new Date(d.created_at).toLocaleDateString("ru-RU") : "-";
+      return `
+        <tr>
+          <td><strong>#${d.id}</strong></td>
+          <td><strong>${d.username}</strong></td>
+          <td>${d.email}</td>
+          <td><span class="status-badge">${d.role}</span></td>
+          <td>${createdDate}</td>
+          <td>
+            <div class="actions-cell">
+              <button onclick="deleteDriver(${d.id})" class="action-btn danger">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  async function deleteDriver(id) {
+    if (!confirm("Delete this driver?")) return;
+    try {
+      await apiRequest(`/employees/${id}`, { method: "DELETE" });
+      await loadAllData();
+      showNotification("Driver deleted", "success");
+    } catch {
+      showNotification("Delete failed", "error");
+    }
+  }
+
+  function updateStats() {
+    document.getElementById("stat-total-cargoes").textContent = cargoes.length;
+    document.getElementById("stat-pending-orders").textContent = orders.filter(o => normalizeStatus(o.status) === "queued").length;
+    document.getElementById("stat-active-shipments").textContent = shipments.filter(s => normalizeStatus(s.status) === "on_way").length;
+    document.getElementById("stat-free-trucks").textContent = trucks.filter(t => !!t.available).length;
+  }
+
+  function updateCharts() {
+    updateStats();
+
+    Object.values(charts).forEach(ch => ch && ch.destroy());
+    charts = {};
+
+    const ctx = document.getElementById("statusChart");
+    if (!ctx) return;
+
+    const onWay = shipments.filter(s => normalizeStatus(s.status) === "on_way").length;
+    const delivered = shipments.filter(s => normalizeStatus(s.status) === "delivered").length;
+    const queued = shipments.filter(s => normalizeStatus(s.status) === "queued" || normalizeStatus(s.status) === "waiting").length;
+
+    charts.statusChart = new Chart(ctx.getContext("2d"), {
+      type: "doughnut",
+      data: {
+        labels: ["On way", "Delivered", "Waiting/Queued"],
+        datasets: [{
+          data: [onWay, delivered, queued],
+          backgroundColor: ["#f97316", "#22c55e", "#f59e0b"],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: "right", labels: { color: "#f4f4f5" } } }
+      }
+    });
+  }
+
+  function updateReports() {
+    const totalRevenue = orders.reduce((sum, o) => sum + (Number(o.price) || 0), 0);
+    const totalDistance = orders.reduce((sum, o) => sum + (Number(o.distance_km) || 0), 0);
+    const totalWeight = cargoes.reduce((sum, c) => sum + (Number(c.weight) || 0), 0);
+    const delivered = shipments.filter(s => normalizeStatus(s.status) === "delivered").length;
+    const successRate = shipments.length ? Math.round((delivered / shipments.length) * 100) : 0;
+
+    document.getElementById("total-revenue").textContent = totalRevenue.toLocaleString();
+    document.getElementById("total-distance").textContent = totalDistance.toLocaleString();
+    document.getElementById("total-weight").textContent = totalWeight.toLocaleString();
+    document.getElementById("success-rate").textContent = `${successRate}%`;
+  }
+
+  function exportToExcel(data, filename) {
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Data");
+    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    saveAs(new Blob([wbout], { type: "application/octet-stream" }), `${filename}.xlsx`);
+  }
+
+  function exportToCSV(data, filename) {
+    const ws = XLSX.utils.json_to_sheet(data);
+    const csv = XLSX.utils.sheet_to_csv(ws);
+    saveAs(new Blob([csv], { type: "text/csv;charset=utf-8" }), `${filename}.csv`);
+  }
+
+  function exportToJSON(data, filename) {
+    const json = JSON.stringify(data, null, 2);
+    saveAs(new Blob([json], { type: "application/json;charset=utf-8" }), `${filename}.json`);
+  }
+
+  function exportToTXT(data, filename) {
+    const txt = data.map((row) => {
+      if (typeof row === "string") return row;
+      return Object.entries(row).map(([k, v]) => `${k}: ${v}`).join(" | ");
+    }).join("\n");
+    saveAs(new Blob([txt], { type: "text/plain;charset=utf-8" }), `${filename}.txt`);
+  }
+
+  function exportToWord(data, filename) {
+    const rows = data.map(obj =>
+      `<tr>${Object.values(obj).map(v => `<td style="border:1px solid #ccc;padding:6px">${String(v ?? "")}</td>`).join("")}</tr>`
+    ).join("");
+
+    const headers = data.length ? Object.keys(data[0]).map(h =>
+      `<th style="border:1px solid #ccc;padding:6px;background:#f3f4f6">${h}</th>`
+    ).join("") : "";
+
+    const html = `
+      <html><head><meta charset="UTF-8"></head><body>
+      <h2>${filename}</h2>
+      <table style="border-collapse:collapse;width:100%">
+        <thead><tr>${headers}</tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      </body></html>
+    `;
+    saveAs(new Blob([html], { type: "application/msword;charset=utf-8" }), `${filename}.doc`);
+  }
+
+  function exportToPDF(data, filename) {
+    const win = window.open("", "_blank");
+    const headers = data.length ? Object.keys(data[0]) : [];
+    const table = `
+      <table style="border-collapse:collapse;width:100%;font-family:Arial">
+        <thead>
+          <tr>
+            ${headers.map(h => `<th style="border:1px solid #333;padding:6px;background:#eee">${h}</th>`).join("")}
+          </tr>
+        </thead>
+        <tbody>
+          ${data.map(row => `
+            <tr>
+              ${headers.map(h => `<td style="border:1px solid #333;padding:6px">${row[h] ?? ""}</td>`).join("")}
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    `;
+    win.document.write(`<html><head><title>${filename}</title></head><body><h2>${filename}</h2>${table}</body></html>`);
+    win.document.close();
+    win.focus();
+    win.print();
+  }
+
+  async function exportData(section, format) {
+    let data = [];
+    let filename = "";
+
+    switch (section) {
+      case "cargoes": data = cargoes; filename = `cargodrip_cargo_${new Date().toISOString().split("T")[0]}`; break;
+      case "orders": data = orders; filename = `cargodrip_orders_${new Date().toISOString().split("T")[0]}`; break;
+      case "shipments": data = shipments; filename = `cargodrip_shipments_${new Date().toISOString().split("T")[0]}`; break;
+      case "trucks": data = trucks; filename = `cargodrip_trucks_${new Date().toISOString().split("T")[0]}`; break;
+      case "drivers": data = drivers; filename = `cargodrip_drivers_${new Date().toISOString().split("T")[0]}`; break;
+      default: showNotification("Unknown section", "error"); return;
+    }
+
+    if (!data.length) return showNotification("No data to export", "info");
+
+    try {
+      switch (format) {
+        case "excel": exportToExcel(data, filename); break;
+        case "csv": exportToCSV(data, filename); break;
+        case "pdf": exportToPDF(data, filename); break;
+        case "word": exportToWord(data, filename); break;
+        case "txt": exportToTXT(data, filename); break;
+        case "json": exportToJSON(data, filename); break;
+        default: showNotification("Unsupported export format", "error"); return;
+      }
+      showNotification(`Exported: ${format}`, "success");
+    } catch (e) {
+      console.error(e);
+      showNotification("Export failed", "error");
+    }
+  }
+
+  function buildReportObject() {
+    const totalRevenue = orders.reduce((sum, o) => sum + (Number(o.price) || 0), 0);
+    const totalDistance = orders.reduce((sum, o) => sum + (Number(o.distance_km) || 0), 0);
+    const totalWeight = cargoes.reduce((sum, c) => sum + (Number(c.weight) || 0), 0);
+    const delivered = shipments.filter(s => normalizeStatus(s.status) === "delivered").length;
+    const successRate = shipments.length ? Math.round((delivered / shipments.length) * 100) : 0;
+
+    return {
+      generatedAt: new Date().toISOString(),
+      summary: {
+        totalCargoes: cargoes.length,
+        pendingOrders: orders.filter(o => normalizeStatus(o.status) === "queued").length,
+        activeShipments: shipments.filter(s => normalizeStatus(s.status) === "on_way").length,
+        freeTrucks: trucks.filter(t => !!t.available).length
+      },
+      kpis: [
+        { name: "Total revenue", value: totalRevenue },
+        { name: "Total distance (km)", value: totalDistance },
+        { name: "Total weight (kg)", value: totalWeight },
+        { name: "Success rate (%)", value: successRate }
+      ]
+    };
+  }
+
+  async function exportFullReport(format) {
+    const report = buildReportObject();
+    const filename = `cargodrip-full-report-${new Date().toISOString().split("T")[0]}`;
+
+    switch (format) {
+      case "excel": exportToExcel([report.summary, ...report.kpis], filename); break;
+      case "csv": exportToCSV([report.summary, ...report.kpis], filename); break;
+      case "json": exportToJSON(report, filename); break;
+      case "pdf": exportToPDF([report.summary, ...report.kpis], filename); break;
+      default: showNotification("Unsupported format", "error"); return;
+    }
+
+    showNotification(`Full report exported: ${format}`, "success");
+  }
+
+  function generateFullReport(){ exportFullReport("json"); }
+
+  function showModal(type) {
+    const id = `${type}-modal`;
+    const overlay = document.getElementById(id);
+    if (!overlay) return showNotification("Modal not found", "error");
+    overlay.classList.add("active");
+
+    if (type === "order") {
+      const select = document.getElementById("order-cargo");
+      select.innerHTML = `<option value="">-- Select Cargo --</option>` +
+        cargoes.map(c => `<option value="${c.id}">${c.title} (ID ${c.id})</option>`).join("");
+    }
+  }
+
+  function closeModal() {
+    document.querySelectorAll(".modal-overlay").forEach(m => m.classList.remove("active"));
+    currentOrderForAssignment = null;
+  }
+
+  document.addEventListener("click", (e) => {
+    if (e.target.classList?.contains("modal-overlay")) closeModal();
+  });
+
+  function setupForms() {
+    const cargoForm = document.getElementById("cargo-form");
+    cargoForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const payload = {
+        title: document.getElementById("cargo-title").value.trim(),
+        sender: document.getElementById("cargo-sender").value.trim(),
+        recipient: document.getElementById("cargo-recipient").value.trim(),
+        weight: Number(document.getElementById("cargo-weight").value),
+        volume: Number(document.getElementById("cargo-volume").value),
+      };
+      try {
+        await apiRequest("/cargoes", { method: "POST", body: JSON.stringify(payload) });
+        closeModal();
+        cargoForm.reset();
+        await loadAllData();
+        showNotification("Cargo created", "success");
+      } catch (err) {
+        showNotification(err.message || "Create cargo failed", "error");
+      }
+    });
+
+    const orderForm = document.getElementById("order-form");
+    orderForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const payload = {
+        cargo_id: Number(document.getElementById("order-cargo").value),
+        to_location: document.getElementById("order-to").value.trim(),
+        distance_km: Number(document.getElementById("order-distance").value),
+        status: "queued"
+      };
+      try {
+        await apiRequest("/orders", { method: "POST", body: JSON.stringify(payload) });
+        closeModal();
+        orderForm.reset();
+        await loadAllData();
+        showNotification("Order created", "success");
+      } catch (err) {
+        showNotification(err.message || "Create order failed", "error");
+      }
+    });
+
+    const truckForm = document.getElementById("truck-form");
+    truckForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const payload = {
+        plate_number: document.getElementById("truck-plate").value.trim(),
+        model: document.getElementById("truck-model").value.trim(),
+        capacity_kg: Number(document.getElementById("truck-capacity").value),
+        volume_m3: Number(document.getElementById("truck-volume").value),
+        available: true
+      };
+      try {
+        await apiRequest("/trucks", { method: "POST", body: JSON.stringify(payload) });
+        closeModal();
+        truckForm.reset();
+        await loadAllData();
+        showNotification("Truck added", "success");
+      } catch (err) {
+        showNotification(err.message || "Add truck failed", "error");
+      }
+    });
+
+    const driverForm = document.getElementById("driver-form");
+    driverForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const payload = {
+        username: document.getElementById("driver-username").value.trim(),
+        password: document.getElementById("driver-password").value,
+        email: document.getElementById("driver-email").value.trim(),
+        role: "driver"
+      };
+      try {
+        await apiRequest("/employees", { method: "POST", body: JSON.stringify(payload) });
+        closeModal();
+        driverForm.reset();
+        await loadAllData();
+        showNotification("Driver added", "success");
+      } catch (err) {
+        showNotification(err.message || "Add driver failed", "error");
+      }
+    });
+  }
+
+  function setupRefresh() {
+    document.getElementById("refresh-btn").addEventListener("click", async () => {
+      try {
+        await loadAllData();
+        showNotification("Data refreshed", "success");
+      } catch {
+        showNotification("Refresh failed", "error");
+      }
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    setupNavigation();
+    setupLogout();
+    setupForms();
+    setupRefresh();
+    updateTime();
+    setInterval(updateTime, 30000);
+    await loadAllData();
+  });
+</script>
+</body>
+</html>

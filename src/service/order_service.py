@@ -171,3 +171,13 @@ class OrderService:
 
         updated = await self.order_repo.find(id=order.id)
         return OrderDTO.model_validate(updated)
+
+    async def delete_order(self, order_id: int) -> None:
+        order = await self.order_repo.find(id=order_id)
+        if order is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Order with id={order_id} not found",
+            )
+
+        await self.order_repo.delete(id=order_id)

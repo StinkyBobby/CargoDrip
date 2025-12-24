@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | CargoDrip Pro</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root{
+      --bg: #090a0c;
+      --panel: rgba(255,255,255,0.06);
+      --line: rgba(255,255,255,0.10);
+
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.62);
+
+      --orange: #f97316;
+      --orange2: #fb923c;
+
+      --danger: #ef4444;
+
+      --shadow: 0 14px 40px rgba(0,0,0,.40);
+      --shadow2: 0 10px 26px rgba(0,0,0,.30);
+      --radius: 14px;
+      --transition: all .22s ease;
+    }
+
+    *{ margin:0; padding:0; box-sizing:border-box; }
+
+    body{
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(900px 520px at 12% 8%, rgba(249,115,22,0.22), transparent 60%),
+        radial-gradient(900px 560px at 88% 18%, rgba(251,146,60,0.14), transparent 58%),
+        radial-gradient(900px 650px at 50% 92%, rgba(249,115,22,0.12), transparent 60%),
+        var(--bg);
+      min-height: 100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 20px;
+      color: var(--text);
+    }
+
+    .auth-card{
+      width: 100%;
+      max-width: 460px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      overflow: hidden;
+    }
+
+    .auth-head{
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+      background:
+        radial-gradient(520px 140px at 20% 0%, rgba(249,115,22,0.22), transparent 60%),
+        rgba(255,255,255,0.03);
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+    }
+
+    .brand-icon{
+      width: 46px; height: 46px;
+      border-radius: 14px;
+      display:flex; align-items:center; justify-content:center;
+      background: rgba(0,0,0,0.40);
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: var(--shadow2);
+      color: rgba(255,255,255,0.95);
+    }
+
+    .brand-text h1{
+      font-size: 18px;
+      font-weight: 1000;
+      letter-spacing: -0.4px;
+      line-height: 1.2;
+      color: rgba(255,255,255,0.95);
+    }
+
+    .brand-text p{
+      margin-top: 2px;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--muted);
+    }
+
+    .auth-body{ padding: 18px 20px 20px; }
+
+    .form-group{ margin-bottom: 12px; }
+
+    label{
+      display:block;
+      margin-bottom: 6px;
+      color: rgba(255,255,255,0.80);
+      font-weight: 900;
+      font-size: 13px;
+    }
+
+    .input-wrap{ position: relative; }
+
+    .input-wrap i{
+      position:absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,0.65);
+      width: 18px;
+      text-align:center;
+      pointer-events:none;
+    }
+
+    input{
+      width:100%;
+      padding: 11px 12px 11px 40px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.92);
+      transition: var(--transition);
+      font-size: 13px;
+      outline:none;
+    }
+
+    input:focus{
+      border-color: rgba(249,115,22,0.55);
+      box-shadow: 0 0 0 3px rgba(249,115,22,0.12);
+    }
+
+    .pass-toggle{
+      position:absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 36px; height: 36px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.85);
+      cursor:pointer;
+      transition: var(--transition);
+    }
+
+    .pass-toggle:hover{
+      background: rgba(249,115,22,0.16);
+      border-color: rgba(249,115,22,0.30);
+      transform: translateY(-50%) translateY(-1px);
+    }
+
+    .btn-submit{
+      width:100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: linear-gradient(135deg, rgba(249,115,22,0.92), rgba(251,146,60,0.72));
+      color: #fff;
+      font-weight: 1000;
+      cursor:pointer;
+      transition: var(--transition);
+      margin-top: 6px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 8px;
+    }
+
+    .btn-submit:hover{ transform: translateY(-2px); box-shadow: var(--shadow2); }
+    .btn-submit:disabled{ opacity: 0.7; cursor: not-allowed; transform: none; }
+
+    .helper-row{
+      margin-top: 10px;
+      display:flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--muted);
+    }
+
+    .error{
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(239,68,68,0.40);
+      background: rgba(239,68,68,0.14);
+      color: rgba(255,255,255,0.92);
+      font-weight: 900;
+      display:none;
+    }
+
+    .loading{
+      margin-top: 12px;
+      display:none;
+      color: rgba(255,255,255,0.75);
+      font-weight: 900;
+      font-size: 12px;
+      align-items:center;
+      gap: 10px;
+    }
+
+    .spinner{
+      width: 16px;
+      height: 16px;
+      border: 3px solid rgba(255,255,255,0.18);
+      border-top: 3px solid rgba(249,115,22,0.90);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body>
+  <div class="auth-card">
+    <div class="auth-head">
+      <div class="brand">
+        <div class="brand-icon"><i class="fas fa-shipping-fast"></i></div>
+        <div class="brand-text">
+          <h1>CargoDrip Pro</h1>
+          <p>Logistics Management System</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="auth-body">
+      <form id="login-form">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <div class="input-wrap">
+            <i class="fas fa-user"></i>
+            <input type="text" id="username" name="username" placeholder="driverjohn" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-wrap">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="password" name="password" placeholder="••••••••" required />
+            <button type="button" class="pass-toggle" id="password-toggle" aria-label="Toggle password">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <button class="btn-submit" type="submit" id="submit-btn">
+          <i class="fas fa-sign-in-alt"></i> Sign in
+        </button>
+
+        <div class="loading" id="loading">
+          <span class="spinner"></span> Authenticating...
+        </div>
+
+        <div class="error" id="error"></div>
+
+        <div class="helper-row">
+          <span id="hint">Use your system credentials</span>
+          <span id="api-hint">POST /auth/login</span>
+        </div>
+      </form>
+    </div>
+  </div>
+
+<script>
+  // Если уже авторизован — можно редиректнуть по роли (как было), но БЕЗ обхода "entered_from_login".
+  // Вариант безопаснее: всегда оставлять на login и требовать вход заново.
+  // Здесь оставлено: если есть token+role -> редирект.
+  document.addEventListener("DOMContentLoaded", () => {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+
+    if (token && role) {
+      if (role === "admin") window.location.href = "/admin_dashboard";
+      if (role === "driver") window.location.href = "/driver_dashboard";
+    }
+  });
+
+  const form = document.getElementById("login-form");
+  const error = document.getElementById("error");
+  const loading = document.getElementById("loading");
+  const submitBtn = document.getElementById("submit-btn");
+
+  document.getElementById("password-toggle").addEventListener("click", () => {
+    const input = document.getElementById("password");
+    const icon = document.querySelector("#password-toggle i");
+    const isPass = input.type === "password";
+    input.type = isPass ? "text" : "password";
+    icon.classList.toggle("fa-eye", !isPass);
+    icon.classList.toggle("fa-eye-slash", isPass);
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    error.style.display = "none";
+    loading.style.display = "flex";
+    submitBtn.disabled = true;
+
+    const payload = {
+      username: document.getElementById("username").value.trim(),
+      password: document.getElementById("password").value,
+    };
+
+    try {
+      const res = await fetch("/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error("Неверный логин или пароль");
+
+      const data = await res.json();
+
+      // ВАЖНО для driver_dashboard: ставим флаг входа с login.html
+      localStorage.setItem("entered_from_login", "1");
+
+      // Токен/роль/username — как у тебя
+      localStorage.setItem("token", data.access_token);
+      localStorage.setItem("role", data.role);
+      localStorage.setItem("username", data.username);
+
+      // Редирект
+      if (data.redirect_url && typeof data.redirect_url === "string") {
+        window.location.href = data.redirect_url;
+      } else {
+        if (data.role === "admin") window.location.href = "/admin_dashboard";
+        else if (data.role === "driver") window.location.href = "/driver_dashboard";
+        else window.location.href = "dashboard.html";
+      }
+    } catch (err) {
+      console.error(err);
+      error.textContent = err.message || "Login failed";
+      error.style.display = "block";
+    } finally {
+      loading.style.display = "none";
+      submitBtn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>
