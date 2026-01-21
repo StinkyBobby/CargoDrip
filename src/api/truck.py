@@ -1,7 +1,5 @@
-from typing import List, Annotated
-
-from fastapi import APIRouter, Query, Depends
-
+from typing import List
+from fastapi import APIRouter, Depends
 from src.deps.truck_deps import get_truck_service 
 
 from src.scheme import TruckDTO
@@ -13,7 +11,6 @@ truck_router = APIRouter(
     tags=["Truck"], 
     prefix="/trucks",
 )
-
 
 @truck_router.post("")
 async def create_truck(
@@ -73,3 +70,9 @@ async def available_truck(
     truck_service: TruckService = Depends(get_truck_service),
 ) -> TruckDTO:
     return await truck_service.set_availability(truck_id, available)
+
+@truck_router.get("/status")
+async def trucks_status(
+    truck_service: TruckService = Depends(get_truck_service),
+) -> TruckDTO:
+    return await truck_service.get_status_report()

@@ -23,6 +23,5 @@ class Database:
         finally:
             await session.close()
 
-    
 
 db = Database(url=settings.database_url, echo=settings.ECHO)

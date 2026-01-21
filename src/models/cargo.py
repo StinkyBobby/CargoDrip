@@ -10,4 +10,3 @@ class CargoORM(Base):
     weight: Mapped[int]
     volume: Mapped[int]
     title: Mapped[str]
-    

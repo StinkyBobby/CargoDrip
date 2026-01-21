@@ -6,7 +6,10 @@ from src.service.auth_service import AuthService
 
 from src.deps.auth_deps import get_auth_service
 
-auth_router = APIRouter(prefix="/auth", tags=["Auth"])
+auth_router = APIRouter(
+    prefix="/auth", 
+    tags=["Auth"]
+    )
 
 @auth_router.post("/login", response_model=TokenResponse)
 async def login(

@@ -15,4 +15,6 @@ class ShipmentsORM(Base):
     to_location: Mapped[str]
     pickup_date: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"))
     delivered_date: Mapped[Optional[datetime]]
+    driver_deriver: Mapped[str] = mapped_column(ForeignKey('employee.id'))
     status: Mapped[DeliveryStatus] = mapped_column(default=DeliveryStatus.on_way)
+

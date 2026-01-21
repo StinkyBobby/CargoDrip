@@ -3,6 +3,7 @@ from fastapi import HTTPException
 from starlette import status
 from src.repositories.base_repo import AbstractRepo
 from src.scheme.employee_scheme import EmployeeDTO, EmployeeCreate
+from src.utils.password import hash_password
 
 
 class EmployeeService:
@@ -13,7 +14,8 @@ class EmployeeService:
         employee = await self.employee_repo.find(**filters)
         if employee is None:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Employee is not found"
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Employee is not found",
             )
         return EmployeeDTO.model_validate(employee)
 
@@ -27,18 +29,21 @@ class EmployeeService:
 
     async def add_employee(self, employee: EmployeeCreate) -> EmployeeDTO:
         employee_dict = employee.model_dump()
-        # преобразуем password → password_hash
-        employee_dict["password_hash"] = employee_dict.pop("password")
-        # здесь можно добавить хэширование, например bcrypt
+
+        raw_password = employee_dict.pop("password")
+        employee_dict["password_hash"] = hash_password(raw_password)
+
         db_employee = await self.employee_repo.create(employee_dict)
         return EmployeeDTO.model_validate(db_employee)
 
     async def add_more(self, employees: List[EmployeeCreate]) -> List[EmployeeDTO]:
-        employees_dict = []
+        employees_dict: List[dict] = []
         for row in employees:
             row_dict = row.model_dump()
-            row_dict["password_hash"] = row_dict.pop("password")
+            raw_password = row_dict.pop("password")
+            row_dict["password_hash"] = hash_password(raw_password)
             employees_dict.append(row_dict)
+
         db_employees = await self.employee_repo.create_more(employees_dict)
         return [EmployeeDTO.model_validate(row) for row in db_employees]
 
@@ -46,10 +51,14 @@ class EmployeeService:
         db_employee = await self.employee_repo.find(id=employee_id)
         if db_employee is None:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Employee is not found"
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Employee is not found",
             )
+
         employee_dict = employee.model_dump()
-        employee_dict["password_hash"] = employee_dict.pop("password")
+        raw_password = employee_dict.pop("password")
+        employee_dict["password_hash"] = hash_password(raw_password)
+
         updated = await self.employee_repo.update(employee_dict, id=employee_id)
         return EmployeeDTO.model_validate(updated)
 
@@ -57,6 +66,7 @@ class EmployeeService:
         employee = await self.employee_repo.delete(id=employee_id)
         if employee is None:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Employee is not found"
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Employee is not found",
             )
         return EmployeeDTO.model_validate(employee)
